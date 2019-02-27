@@ -1,0 +1,480 @@
+<html>
+<body>
+<script src="resources/eml_report_loadable_data.js"></script>
+<div class="dead">
+<pre class="code">
+<span class="srcline"><span class="lineno"><a href="1,1" id="srcline1">  1</a></span><span class="line">function [ Time, v, r, theta, psi , flag ] = propagate_spirals_try( v0 ,r0, theta0, psi0, thetaf, ee )</span></span>
+<span class="srcline"><span class="lineno"><a href="1,2" id="srcline2">  2</a></span><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,3" id="srcline3">  3</a></span><span class="line"><span class="comment">%              CONTROLLED GENERALIZED LOGARITHMIC SPIRALS</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,4" id="srcline4">  4</a></span><span class="line"><span class="comment">%                   Written by David Morante (UC3M)</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,5" id="srcline5">  5</a></span><span class="line"><span class="comment">%                        dmorante@ing.uc3m.es</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,6" id="srcline6">  6</a></span><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,7" id="srcline7">  7</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,8" id="srcline8">  8</a></span><span class="line"><span class="comment">% INPUTS ::</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,9" id="srcline9">  9</a></span><span class="line"><span class="comment">%        r0      :: Initial Radius</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,10" id="srcline10"> 10</a></span><span class="line"><span class="comment">%        v0      :: Magnitude of the initial velocity</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,11" id="srcline11"> 11</a></span><span class="line"><span class="comment">%        theta0  :: Initial Polar angle [radians]</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,12" id="srcline12"> 12</a></span><span class="line"><span class="comment">%        psi0    :: Initial Flight Path angle</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,13" id="srcline13"> 13</a></span><span class="line"><span class="comment">%        thetaf  :: Final value of the polar angle [radians]</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,14" id="srcline14"> 14</a></span><span class="line"><span class="comment">%        ee      :: The spiral control parameter</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,15" id="srcline15"> 15</a></span><span class="line"><span class="comment">%        Npoints :: Orientations at which the state is to be computed (scalar or vector)</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,16" id="srcline16"> 16</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,17" id="srcline17"> 17</a></span><span class="line"><span class="comment">% OUTPUTS ::</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,18" id="srcline18"> 18</a></span><span class="line"><span class="comment">%        theta  :: Npoints Polar angles between theta0 and thetaf</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,19" id="srcline19"> 19</a></span><span class="line"><span class="comment">%        r      :: Radius at polar angles theta</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,20" id="srcline20"> 20</a></span><span class="line"><span class="comment">%        v      :: Velocity at polar angles theta</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,21" id="srcline21"> 21</a></span><span class="line"><span class="comment">%        psi    :: Flight Path angle at polar angles theta</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,22" id="srcline22"> 22</a></span><span class="line"><span class="comment">%        Time   :: Time of flight at polar angles theta</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,23" id="srcline23"> 23</a></span><span class="line"><span class="comment">%        Flag   :: Status of the propagation. Posible values:</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,24" id="srcline24"> 24</a></span><span class="line"><span class="comment">%               1 --&gt; Normal Propagation</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,25" id="srcline25"> 25</a></span><span class="line"><span class="comment">%              -1 --&gt; Asymptote exceeded. Reduce the value of thetaf</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,26" id="srcline26"> 26</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,27" id="srcline27"> 27</a></span><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,28" id="srcline28"> 28</a></span><span class="line"><span class="comment">% Equations are based on Roa et al. (Nov.15)</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,29" id="srcline29"> 29</a></span><span class="line"><span class="comment">% 'Controlled generalized logarithmic spirals for low-thrust mission desing'</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,30" id="srcline30"> 30</a></span><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,31" id="srcline31"> 31</a></span><span class="line"><span class="comment">% NOTE 1 ! ALL VARIBLES SHOULD NON-DIMENSIONAL GIVEN THAT mu=1</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,32" id="srcline32"> 32</a></span><span class="line"><span class="comment">% NOTE 2 ! ee = 1/2 correspond to the tangential steering case</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,33" id="srcline33"> 33</a></span><span class="line"><span class="comment">% NOTE 3 ! We consider that when phi0 = pi/2 we are in raising regime</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,34" id="srcline34"> 34</a></span><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,35" id="srcline35"> 35</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,36" id="srcline36"> 36</a></span><span class="line"><span class="comment">% Initialized Status Variable</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,37" id="srcline37"> 37</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,38" id="srcline38"> 38</a></span><span class="line">flag  = 1;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,39" id="srcline39"> 39</a></span><span class="line">PI    = 3.14159265358979D0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,40" id="srcline40"> 40</a></span><span class="line">Time  = 0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,41" id="srcline41"> 41</a></span><span class="line">Npoints = 1;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,42" id="srcline42"> 42</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,43" id="srcline43"> 43</a></span><span class="line"><span class="comment">% Get the constants of Motion</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,44" id="srcline44"> 44</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,45" id="srcline45"> 45</a></span><span class="line">K1    = v0*v0 - 2*(1-ee)/r0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,46" id="srcline46"> 46</a></span><span class="line">K2    = v0*v0*r0*sin(psi0);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,47" id="srcline47"> 47</a></span><span class="line">theta = linspace(theta0,thetaf,Npoints);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,48" id="srcline48"> 48</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,49" id="srcline49"> 49</a></span><span class="line"><span class="comment">% if K2 &lt; 0</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,50" id="srcline50"> 50</a></span><span class="line"><span class="comment">%     flag = -1;</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,51" id="srcline51"> 51</a></span><span class="line"><span class="comment">% end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,52" id="srcline52"> 52</a></span><span class="line"><span class="comment">% %</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,53" id="srcline53"> 53</a></span><span class="line"><span class="comment">% if K1 &lt; -abs(eps) &amp;&amp; K2 &gt; 2 * ( 1 - ee )</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,54" id="srcline54"> 54</a></span><span class="line"><span class="comment">%     flag = -1;</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,55" id="srcline55"> 55</a></span><span class="line"><span class="comment">% end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,56" id="srcline56"> 56</a></span><span class="line"><span class="comment">% %</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,57" id="srcline57"> 57</a></span><span class="line"><span class="comment">% if K1 &lt; -abs(eps) &amp;&amp; K2 &gt; K1 * r0 + 2 * ( 1 - ee )</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,58" id="srcline58"> 58</a></span><span class="line"><span class="comment">%     flag = -1;</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,59" id="srcline59"> 59</a></span><span class="line"><span class="comment">% end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,60" id="srcline60"> 60</a></span><span class="line"><span class="comment">% %</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,61" id="srcline61"> 61</a></span><span class="line"><span class="comment">% if K1 &gt; abs(eps) &amp;&amp; r0 &lt; ( K2 - 2 * ( 1 - ee )) / K1</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,62" id="srcline62"> 62</a></span><span class="line"><span class="comment">%     flag = -1;</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,63" id="srcline63"> 63</a></span><span class="line"><span class="comment">% end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,64" id="srcline64"> 64</a></span><span class="line"><span class="comment">% </span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,65" id="srcline65"> 65</a></span><span class="line"><span class="comment">% if abs(K1)&lt; abs(eps)&amp;&amp; K2 ==1 &amp;&amp; ee == 0.5</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,66" id="srcline66"> 66</a></span><span class="line"><span class="comment">%     flag = -1;</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,67" id="srcline67"> 67</a></span><span class="line"><span class="comment">% end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,68" id="srcline68"> 68</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,69" id="srcline69"> 69</a></span><span class="line"><span class="comment">% Get the initial Regime (+1--&gt; Raising; -1 --&gt; Lowering)</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,70" id="srcline70"> 70</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,71" id="srcline71"> 71</a></span><span class="line">regime0 = sign(cos(psi0));</span></span>
+<span class="srcline"><span class="lineno"><a href="1,72" id="srcline72"> 72</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,73" id="srcline73"> 73</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,74" id="srcline74"> 74</a></span><span class="line">if flag == 1</span></span>
+<span class="srcline"><span class="lineno"><a href="1,75" id="srcline75"> 75</a></span><span class="line">    </span></span>
+<span class="srcline"><span class="lineno"><a href="1,76" id="srcline76"> 76</a></span><span class="line">    if K1  &lt; 0 <span class="comment">% Elliptical spiral</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,77" id="srcline77"> 77</a></span><span class="line">        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,78" id="srcline78"> 78</a></span><span class="line">        <span class="comment">% THE PARTICLE NEVER SCAPE (rmax) when propagated backward or forward</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,79" id="srcline79"> 79</a></span><span class="line">        <span class="comment">% The particle reach the origin of the central body</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,80" id="srcline80"> 80</a></span><span class="line">        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,81" id="srcline81"> 81</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,82" id="srcline82"> 82</a></span><span class="line">        <span class="comment">% Maximum radius</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,83" id="srcline83"> 83</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,84" id="srcline84"> 84</a></span><span class="line">        rmax    = ( 2 * ( 1- ee) - K2 ) / ( -K1 );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,85" id="srcline85"> 85</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,86" id="srcline86"> 86</a></span><span class="line">        ell     = sqrt( 4 * ( 1 - ee )^2 - K2^2 );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,87" id="srcline87"> 87</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,88" id="srcline88"> 88</a></span><span class="line">        <span class="comment">% Axis of symmetry</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,89" id="srcline89"> 89</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,90" id="srcline90"> 90</a></span><span class="line">        thetam  = theta0 + regime0 * K2 / ell * abs( acosh ( rmax / r0 - 2 * ( 1 - ee) / K2 * ( 1 - rmax / r0) )) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,91" id="srcline91"> 91</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,92" id="srcline92"> 92</a></span><span class="line">        <span class="comment">% Regime at each theta</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,93" id="srcline93"> 93</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,94" id="srcline94"> 94</a></span><span class="line">        regime  = -1 * (theta &gt; thetam) + 1 * (theta &lt;= thetam) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,95" id="srcline95"> 95</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,96" id="srcline96"> 96</a></span><span class="line">        <span class="comment">% Compute Trajectory</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,97" id="srcline97"> 97</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,98" id="srcline98"> 98</a></span><span class="line">        beta    = ell / K2 * ( theta - thetam );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,99" id="srcline99"> 99</a></span><span class="line">        r       = rmax * ( 2 * ( 1 - ee) + K2 ) ./ ( 2 * ( 1 - ee ) + K2 * cosh ( beta ) )  ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,100" id="srcline100">100</a></span><span class="line">        v       = sqrt ( K1 + 2 ./ r * ( 1 - ee ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,101" id="srcline101">101</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,102" id="srcline102">102</a></span><span class="line">        cpsi    =  regime .* ( sqrt ( ( 2 * ( 1 - ee ) +  K1 * r ).^2 - K2^2 ) ./ ( 2 * ( 1 - ee ) + K1 * r ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,103" id="srcline103">103</a></span><span class="line">        spsi    =  K2 ./ ( 2 * ( 1 - ee ) + K1 * r );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,104" id="srcline104">104</a></span><span class="line">        psi     =  atan2( real(spsi), real(cpsi)) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,105" id="srcline105">105</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,106" id="srcline106">106</a></span><span class="line">        <span class="comment">% Time of flight</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,107" id="srcline107">107</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,108" id="srcline108">108</a></span><span class="line">        vm      = sqrt(  K2 / rmax );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,109" id="srcline109">109</a></span><span class="line">        kk      = sqrt( -K1 * rmax / ( 4 * ( 1 - ee ) ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,110" id="srcline110">110</a></span><span class="line">        kp      = sqrt( 1 - kk^2);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,111" id="srcline111">111</a></span><span class="line">        nn      = K1 * rmax / ( 2 * K2 ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,112" id="srcline112">112</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,113" id="srcline113">113</a></span><span class="line">        <span class="comment">% Elliptic integrals</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,114" id="srcline114">114</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,115" id="srcline115">115</a></span><span class="line">        phi0    = real ( asin ( vm / v0 * sqrt( 2 / ( 1 + sin( psi0 ) ) ) ) ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,116" id="srcline116">116</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,117" id="srcline117">117</a></span><span class="line">        [~,E01] = ELIT(kk,90.0);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,118" id="srcline118">118</a></span><span class="line">        [~,E02] = ELIT(kk,phi0*180/PI);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,119" id="srcline119">119</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,120" id="srcline120">120</a></span><span class="line">        Pi01 = ELIT3(90.0,kk,nn);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,121" id="srcline121">121</a></span><span class="line">        Pi02 = ELIT3(phi0*180/PI,kk,nn);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,122" id="srcline122">122</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,123" id="srcline123">123</a></span><span class="line">        E0      = E02-E01;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,124" id="srcline124">124</a></span><span class="line">        Pi0     = Pi02-Pi01;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,125" id="srcline125">125</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,126" id="srcline126">126</a></span><span class="line">        phi     = real(asin ( vm ./ v .* sqrt( 2 ./ ( 1 + sin( psi ) ) ) )) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,127" id="srcline127">127</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,128" id="srcline128">128</a></span><span class="line">        [~,E03] = ELIT(kk,phi*180/PI);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,129" id="srcline129">129</a></span><span class="line">        Pi03        = ELIT3(phi*180/PI,kk,nn);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,130" id="srcline130">130</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,131" id="srcline131">131</a></span><span class="line">        E       = E03  - E01;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,132" id="srcline132">132</a></span><span class="line">        Pi      = Pi03 - Pi01;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,133" id="srcline133">133</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,134" id="srcline134">134</a></span><span class="line">        K4      = - regime0 .* ( r0 * v0 / K1 * sqrt( ( 1 - sin( psi0 ) ) / (1 + sin( psi0 ) ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,135" id="srcline135">135</a></span><span class="line">            )) + ( 2 * ( 2 * ( 1 - ee ) * kp^2 * Pi0 - K2 * E0 ) * sqrt( 1 - ee )) / ( ( -K1 )^( 1.5 ) * sqrt( K2 ) ) ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,136" id="srcline136">136</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,137" id="srcline137">137</a></span><span class="line">        Time    =   K4 + regime .* ( r .* v / K1 .* sqrt( ( 1 - sin( psi ) ) ./ (1 + sin( psi ) ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,138" id="srcline138">138</a></span><span class="line">            )) + ( 2 * ( 2 * ( 1 - ee ) * kp^2 * Pi - K2 * E ) * sqrt( 1 - ee )) / ( ( -K1 )^( 1.5 ) * sqrt( K2 ) ) ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,139" id="srcline139">139</a></span><span class="line">        </span></span>
+<span class="srcline"><span class="lineno"><a href="1,140" id="srcline140">140</a></span><span class="line">        </span></span>
+<span class="srcline"><span class="lineno"><a href="1,141" id="srcline141">141</a></span><span class="line">    elseif K1 &gt; 0 <span class="comment">% Hiperbolic  Spiral</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,142" id="srcline142">142</a></span><span class="line">        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,143" id="srcline143">143</a></span><span class="line">        <span class="comment">% THE PARTICLE REACHES INFINITY WITH A NON-ZERO VELOCITY</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,144" id="srcline144">144</a></span><span class="line">        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,145" id="srcline145">145</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,146" id="srcline146">146</a></span><span class="line">        if  K2 &lt; 2 * ( 1 - ee )</span></span>
+<span class="srcline"><span class="lineno"><a href="1,147" id="srcline147">147</a></span><span class="line">            <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,148" id="srcline148">148</a></span><span class="line">            <span class="comment">% Type I Hiperbolic Spiral ( It has an asymthotic value )</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,149" id="srcline149">149</a></span><span class="line">            <span class="comment">% Raising regime[ reaches infinity ], Lowering regime[ reaches origin ]</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,150" id="srcline150">150</a></span><span class="line">            <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,151" id="srcline151">151</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,152" id="srcline152">152</a></span><span class="line">            ell     = sqrt( 4 * ( 1 - ee )^2 - K2^2 );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,153" id="srcline153">153</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,154" id="srcline154">154</a></span><span class="line">            zeta    = 2 * ( 1 - ee ) + ell ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,155" id="srcline155">155</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,156" id="srcline156">156</a></span><span class="line">            <span class="comment">% Get the Position of the Asymptote</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,157" id="srcline157">157</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,158" id="srcline158">158</a></span><span class="line">            thetaAs = theta0 + regime0 * K2 / ell * log( K2 * ( zeta - ell - K2 * sin( psi0 ) + ell * abs( cos(psi0) ) ) / ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,159" id="srcline159">159</a></span><span class="line">                ( r0 * K1 * zeta * sin(psi0) ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,160" id="srcline160">160</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,161" id="srcline161">161</a></span><span class="line">            <span class="comment">% Check that the desired theta is lower than Asymtote</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,162" id="srcline162">162</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,163" id="srcline163">163</a></span><span class="line">            if (theta0 &lt; thetaAs) &amp;&amp; (thetaAs &lt; thetaf)</span></span>
+<span class="srcline"><span class="lineno"><a href="1,164" id="srcline164">164</a></span><span class="line">                </span></span>
+<span class="srcline"><span class="lineno"><a href="1,165" id="srcline165">165</a></span><span class="line">                flag = -1;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,166" id="srcline166">166</a></span><span class="line">                </span></span>
+<span class="srcline"><span class="lineno"><a href="1,167" id="srcline167">167</a></span><span class="line">            end</span></span>
+<span class="srcline"><span class="lineno"><a href="1,168" id="srcline168">168</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,169" id="srcline169">169</a></span><span class="line">            beta    = regime0 * ell / K2 * ( thetaAs - theta );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,170" id="srcline170">170</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,171" id="srcline171">171</a></span><span class="line">            r      = zeta * ell^2 ./  ( K1 * ( sinh( beta / 2) .* ( 4 * zeta * ( 1 - ee ) * sinh( beta / 2 ) + ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,172" id="srcline172">172</a></span><span class="line">                ( zeta^2 - K2^2 ) * cosh( beta / 2 ) ) ) )  ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,173" id="srcline173">173</a></span><span class="line">            v      = sqrt ( K1 + 2 ./ r * ( 1 - ee ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,174" id="srcline174">174</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,175" id="srcline175">175</a></span><span class="line">            cpsi   = regime0 * ( sqrt ( ( 2 * ( 1 - ee ) +  K1 * r ).^2 - K2^2 ) ./ ( 2 * ( 1 - ee ) + K1 * r ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,176" id="srcline176">176</a></span><span class="line">            spsi   = K2 ./ ( 2 * ( 1 - ee ) + K1 * r );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,177" id="srcline177">177</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,178" id="srcline178">178</a></span><span class="line">            psi    =  atan2(spsi , cpsi) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,179" id="srcline179">179</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,180" id="srcline180">180</a></span><span class="line">            <span class="comment">% Time of Flight</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,181" id="srcline181">181</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,182" id="srcline182">182</a></span><span class="line">            kk      =  1 / 2 * sqrt( ( 2 * ( 1 - ee ) + K2 ) / ( 1 - ee ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,183" id="srcline183">183</a></span><span class="line">            nn      =  ( 2 * ( 1 - ee ) + K2 ) / ( 2 * K2 ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,184" id="srcline184">184</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,185" id="srcline185">185</a></span><span class="line">            <span class="comment">% Ellliptic integrals</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,186" id="srcline186">186</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,187" id="srcline187">187</a></span><span class="line">            phi0   = asin ( sqrt( K1 * r0 * sin(psi0) / ( nn * K2 * ( 1 - sin(psi0) ) ) ) ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,188" id="srcline188">188</a></span><span class="line">            phi    = asin ( sqrt( K1 * r .* sin(psi) ./ ( nn * K2 * ( 1 - sin(psi) ) ) ) ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,189" id="srcline189">189</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,190" id="srcline190">190</a></span><span class="line">            <span class="comment">% Do only if any asymptote is reached</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,191" id="srcline191">191</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,192" id="srcline192">192</a></span><span class="line">            if flag == 1</span></span>
+<span class="srcline"><span class="lineno"><a href="1,193" id="srcline193">193</a></span><span class="line">                </span></span>
+<span class="srcline"><span class="lineno"><a href="1,194" id="srcline194">194</a></span><span class="line">               [~,E0] = ELIT(kk,phi0*180/PI);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,195" id="srcline195">195</a></span><span class="line">                Pi0   = ELIT3(phi0*180/PI,kk,nn);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,196" id="srcline196">196</a></span><span class="line">                </span></span>
+<span class="srcline"><span class="lineno"><a href="1,197" id="srcline197">197</a></span><span class="line">                [~,E] = ELIT(kk,phi*180/PI);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,198" id="srcline198">198</a></span><span class="line">                Pi    = ELIT3(phi*180/PI,kk,nn);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,199" id="srcline199">199</a></span><span class="line">                </span></span>
+<span class="srcline"><span class="lineno"><a href="1,200" id="srcline200">200</a></span><span class="line">                K4     = - regime0 * ( r0*v0 / K1 * sqrt( (1 + sin(psi0) ) / ( 1 - sin(psi0) ) ) - ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,201" id="srcline201">201</a></span><span class="line">                    2 * ( E0 - ( 1 - nn ) * Pi0 ) * sqrt( K2 * ( 1 - ee ) ) / K1 ^ ( 3/2 ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,202" id="srcline202">202</a></span><span class="line">                </span></span>
+<span class="srcline"><span class="lineno"><a href="1,203" id="srcline203">203</a></span><span class="line">                Time   =  K4 + regime0 * ( r.*v / K1 .* sqrt( (1 + sin(psi) ) ./ ( 1 - sin(psi) ) ) - ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,204" id="srcline204">204</a></span><span class="line">                    2 * ( E - ( 1 - nn ) * Pi ) .* sqrt( K2 * ( 1 - ee ) ) / K1 ^ ( 3/2 ) ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,205" id="srcline205">205</a></span><span class="line">                </span></span>
+<span class="srcline"><span class="lineno"><a href="1,206" id="srcline206">206</a></span><span class="line">            end</span></span>
+<span class="srcline"><span class="lineno"><a href="1,207" id="srcline207">207</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,208" id="srcline208">208</a></span><span class="line">        elseif  K2 &gt; 2 * ( 1 - ee )</span></span>
+<span class="srcline"><span class="lineno"><a href="1,209" id="srcline209">209</a></span><span class="line">            <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,210" id="srcline210">210</a></span><span class="line">            <span class="comment">% Type II Hiperbolic Spiral</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,211" id="srcline211">211</a></span><span class="line">            <span class="comment">% There is a transition between raising and lowering regime [rmin]</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,212" id="srcline212">212</a></span><span class="line">            <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,213" id="srcline213">213</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,214" id="srcline214">214</a></span><span class="line">            <span class="comment">% Minimum Radius</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,215" id="srcline215">215</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,216" id="srcline216">216</a></span><span class="line">            rmin = ( K2 - 2 * ( 1 - ee ) ) / ( K1 );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,217" id="srcline217">217</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,218" id="srcline218">218</a></span><span class="line">            ell  = sqrt ( K2^2 - 4 * ( 1 - ee )^2 );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,219" id="srcline219">219</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,220" id="srcline220">220</a></span><span class="line">            thetam   = theta0 - regime0 * K2 / ell * ( pi / 2 + atan ( ( 2 * ( 1 - ee ) - K2 * sin(psi0) ) / ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,221" id="srcline221">221</a></span><span class="line">                (ell * abs ( cos(psi0) ) ) ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,222" id="srcline222">222</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,223" id="srcline223">223</a></span><span class="line">            <span class="comment">% Get the position of the Asymptotes</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,224" id="srcline224">224</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,225" id="srcline225">225</a></span><span class="line">            thetaAs1 = thetam +  K2 / ell * ( pi / 2 + atan ( 2 * ( 1 - ee ) / ( ell ) ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,226" id="srcline226">226</a></span><span class="line">            thetaAs2 = thetam -  K2 / ell * ( pi / 2 + atan ( 2 * ( 1 - ee ) / ( ell ) ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,227" id="srcline227">227</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,228" id="srcline228">228</a></span><span class="line">            <span class="comment">% Check that the desired theta is lower than Asymtote</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,229" id="srcline229">229</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,230" id="srcline230">230</a></span><span class="line">            if (( thetaf &gt; thetaAs1) &amp;&amp; (thetaAs1&gt;theta0) )|| (( thetaf &gt; thetaAs2) &amp;&amp; (thetaAs2&gt;theta0) )</span></span>
+<span class="srcline"><span class="lineno"><a href="1,231" id="srcline231">231</a></span><span class="line">                </span></span>
+<span class="srcline"><span class="lineno"><a href="1,232" id="srcline232">232</a></span><span class="line">                flag = -1;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,233" id="srcline233">233</a></span><span class="line">                </span></span>
+<span class="srcline"><span class="lineno"><a href="1,234" id="srcline234">234</a></span><span class="line">            end</span></span>
+<span class="srcline"><span class="lineno"><a href="1,235" id="srcline235">235</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,236" id="srcline236">236</a></span><span class="line">            beta = ell / K2 * ( theta - thetam );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,237" id="srcline237">237</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,238" id="srcline238">238</a></span><span class="line">            r   = rmin * ( ( 2 * ( 1 - ee ) + K2 ) ./ ( 2 * ( 1 - ee ) + K2 * cos(beta) ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,239" id="srcline239">239</a></span><span class="line">            v   = sqrt ( K1 + 2 ./ r * ( 1 - ee ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,240" id="srcline240">240</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,241" id="srcline241">241</a></span><span class="line">            regime  = -1 * (theta &lt; thetam) + 1 * (theta &gt;= thetam) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,242" id="srcline242">242</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,243" id="srcline243">243</a></span><span class="line">            cpsi   = regime .* ( sqrt ( ( 2 * ( 1 - ee ) +  K1 * r ).^2 - K2^2 ) ./ ( 2 * ( 1 - ee ) + K1 * r ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,244" id="srcline244">244</a></span><span class="line">            spsi   = K2 ./ ( 2 * ( 1 - ee ) + K1 * r );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,245" id="srcline245">245</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,246" id="srcline246">246</a></span><span class="line">            psi    =  atan2( real(spsi) , real(cpsi) ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,247" id="srcline247">247</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,248" id="srcline248">248</a></span><span class="line">            <span class="comment">% Time of Flight</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,249" id="srcline249">249</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,250" id="srcline250">250</a></span><span class="line">            kk      =  2 * sqrt( 1 - ee ) / sqrt( K2 + 2 * ( 1 - ee ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,251" id="srcline251">251</a></span><span class="line">            nn      =  2 * ( 1 - ee ) / K2 ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,252" id="srcline252">252</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,253" id="srcline253">253</a></span><span class="line">            <span class="comment">% Ellliptic integrals</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,254" id="srcline254">254</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,255" id="srcline255">255</a></span><span class="line">            phi0    = real(asin ( sqrt ( 2 * ( 1 - ee ) * ( 1 - sin (psi0) )) / ( kk * sqrt ( K2 - 2 * ( 1 - ee ) * sin(psi0) ) ) ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,256" id="srcline256">256</a></span><span class="line">            phi    =  real(asin ( sqrt ( 2 * ( 1 - ee ) * ( 1 - sin (psi) )) ./ ( kk * sqrt ( K2 - 2 * ( 1 - ee ) * sin(psi) ) ) ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,257" id="srcline257">257</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,258" id="srcline258">258</a></span><span class="line">            if flag == 1</span></span>
+<span class="srcline"><span class="lineno"><a href="1,259" id="srcline259">259</a></span><span class="line">                <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,260" id="srcline260">260</a></span><span class="line">                [F0,E0] = ELIT(kk,phi0*180/PI);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,261" id="srcline261">261</a></span><span class="line">                Pi0    = ELIT3(phi0*180/PI,kk,nn);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,262" id="srcline262">262</a></span><span class="line">                <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,263" id="srcline263">263</a></span><span class="line">                [F,E] = ELIT(kk,phi*180/PI);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,264" id="srcline264">264</a></span><span class="line">                Pi    = ELIT3(phi*180/PI,kk,nn);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,265" id="srcline265">265</a></span><span class="line">                <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,266" id="srcline266">266</a></span><span class="line">                K4      = + regime0 * ( ( ( K2 + 2 * (1 - ee) ) * K2 * E0 - K1 * rmin * ( K2 * F0 + 2 * ( 1 - ee ) * Pi0 )) / ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,267" id="srcline267">267</a></span><span class="line">                    ( K1 * sqrt( K1 * K2 * ( K2 + 2 * ( 1 - ee ) ) ) ) + 2 * ( 1 - ee ) / ( K1^( 3/2 )) * asinh( sqrt( ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,268" id="srcline268">268</a></span><span class="line">                    2 * K1 * r0 * ( r0 * v0 ^2 - K2 )) / ( 2 * sqrt( K2 * r0 * v0^2 + ( r0 * v0^2 - K2 ) * ( 1 - ee ) ) ) ) +...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,269" id="srcline269">269</a></span><span class="line">                    - v0 / K1^2 * sqrt ( r0^2 * v0^4 - K2 ^2 ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,270" id="srcline270">270</a></span><span class="line">                <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,271" id="srcline271">271</a></span><span class="line">                Time    = K4 - regime .* ( ( ( K2 + 2 .* (1 - ee) ) .* K2 .* E - K1 .* rmin .* ( K2 .* F + 2 .* ( 1 - ee ) .* Pi )) ./ ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,272" id="srcline272">272</a></span><span class="line">                    ( K1 .* sqrt( K1 .* K2 .* ( K2 + 2 .* ( 1 - ee ) ) ) ) + 2 .* ( 1 - ee ) / ( K1^( 3/2 )) .* asinh( sqrt( ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,273" id="srcline273">273</a></span><span class="line">                    2 .* K1 .* r .* ( r .* v.^2 - K2 )) ./ ( 2 .* sqrt( K2 .* r .* v.^2 + ( r .* v.^2 - K2 ) .* ( 1 - ee ) ) ) ) +...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,274" id="srcline274">274</a></span><span class="line">                    - v ./ K1^2 .* sqrt ( r.^2 .* v.^4 - K2^2 ) ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,275" id="srcline275">275</a></span><span class="line">                </span></span>
+<span class="srcline"><span class="lineno"><a href="1,276" id="srcline276">276</a></span><span class="line">            end</span></span>
+<span class="srcline"><span class="lineno"><a href="1,277" id="srcline277">277</a></span><span class="line">        else</span></span>
+<span class="srcline"><span class="lineno"><a href="1,278" id="srcline278">278</a></span><span class="line">            <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,279" id="srcline279">279</a></span><span class="line">            <span class="comment">% Limit case Hiperbolyc spiral</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,280" id="srcline280">280</a></span><span class="line">            <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,281" id="srcline281">281</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,282" id="srcline282">282</a></span><span class="line">            <span class="comment">% Get the asymptote</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,283" id="srcline283">283</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,284" id="srcline284">284</a></span><span class="line">            thetaAs  = theta0 - regime0 * ( 1 - sqrt( 1 + 4 * ( 1 - ee ) / ( K1 * r0 ) ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,285" id="srcline285">285</a></span><span class="line">            beta     = theta - thetaAs ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,286" id="srcline286">286</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,287" id="srcline287">287</a></span><span class="line">            r       = 4 * ( 1 - ee )./ ( K1 * beta .* ( beta - regime0 * 2 ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,288" id="srcline288">288</a></span><span class="line">            v       = sqrt ( K1 + 2 ./ r * ( 1 - ee ));</span></span>
+<span class="srcline"><span class="lineno"><a href="1,289" id="srcline289">289</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,290" id="srcline290">290</a></span><span class="line">            cpsi   = regime0 .* ( sqrt ( ( 2 * ( 1 - ee ) +  K1 * r ).^2 - K2^2 ) ./ ( 2 * ( 1 - ee ) + K1 * r ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,291" id="srcline291">291</a></span><span class="line">            spsi   = K2 ./ ( 2 * ( 1 - ee ) + K1 * r );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,292" id="srcline292">292</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,293" id="srcline293">293</a></span><span class="line">            psi    =  atan2( spsi , cpsi ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,294" id="srcline294">294</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,295" id="srcline295">295</a></span><span class="line">            <span class="comment">% Time of flight</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,296" id="srcline296">296</a></span><span class="line">            <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,297" id="srcline297">297</a></span><span class="line">            H0       =  v0 * sqrt ( r0 * ( r0 * v0^2 + 2 * ( 1 - ee ) ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,298" id="srcline298">298</a></span><span class="line">            Hf       =  v .* sqrt ( r .* ( r .* v.^2 + 2 * ( 1 - ee ) ) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,299" id="srcline299">299</a></span><span class="line">            Time     =  regime0 * 1 / K1^(3/2) * ( Hf - H0 + ( 1 - ee ) * log ( ( r0 * v0^2 + 1 - ee + H0 ) / (  r * v^2 + 1 - ee + Hf)) );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,300" id="srcline300">300</a></span><span class="line">        end</span></span>
+<span class="srcline"><span class="lineno"><a href="1,301" id="srcline301">301</a></span><span class="line">        </span></span>
+<span class="srcline"><span class="lineno"><a href="1,302" id="srcline302">302</a></span><span class="line">    else  <span class="comment">% Parabolic spiral</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,303" id="srcline303">303</a></span><span class="line">        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,304" id="srcline304">304</a></span><span class="line">        <span class="comment">% THE FLIGHT PATH ANGLE REMAINS CONSTANT</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,305" id="srcline305">305</a></span><span class="line">        <span class="comment">% THE PARTICLE REACHES INFINITY WITH A ZERO VELOCITY</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,306" id="srcline306">306</a></span><span class="line">        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,307" id="srcline307">307</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,308" id="srcline308">308</a></span><span class="line">        ell     = sqrt( 4 * ( 1 - ee )^2 - K2^2 );</span></span>
+<span class="srcline"><span class="lineno"><a href="1,309" id="srcline309">309</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,310" id="srcline310">310</a></span><span class="line">        r       = r0 * exp( regime0 * ell * ( theta - theta0 ) / K2 ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,311" id="srcline311">311</a></span><span class="line">        v       = sqrt ( K1 + 2 ./ r * ( 1 - ee ));</span></span>
+<span class="srcline"><span class="lineno"><a href="1,312" id="srcline312">312</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,313" id="srcline313">313</a></span><span class="line">        psi     = psi0*ones(size(r));</span></span>
+<span class="srcline"><span class="lineno"><a href="1,314" id="srcline314">314</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,315" id="srcline315">315</a></span><span class="line">        <span class="comment">% Time of flight</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,316" id="srcline316">316</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,317" id="srcline317">317</a></span><span class="line">        Time       = regime0 * 2 * sqrt( 2 * ( 1 - ee ) ) / 3 / ell * ( r.^(3/2) - r0^(3/2) ) ;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,318" id="srcline318">318</a></span><span class="line">        <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,319" id="srcline319">319</a></span><span class="line">        </span></span>
+<span class="srcline"><span class="lineno"><a href="1,320" id="srcline320">320</a></span><span class="line">    end</span></span>
+<span class="srcline"><span class="lineno"><a href="1,321" id="srcline321">321</a></span><span class="line">    <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,322" id="srcline322">322</a></span><span class="line">    </span></span>
+<span class="srcline"><span class="lineno"><a href="1,323" id="srcline323">323</a></span><span class="line">else</span></span>
+<span class="srcline"><span class="lineno"><a href="1,324" id="srcline324">324</a></span><span class="line">    Time  = -1.0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,325" id="srcline325">325</a></span><span class="line">    v     = -1.0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,326" id="srcline326">326</a></span><span class="line">    r     = -1.0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,327" id="srcline327">327</a></span><span class="line">    theta = -1.0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,328" id="srcline328">328</a></span><span class="line">    psi   = -1.0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,329" id="srcline329">329</a></span><span class="line">end</span></span>
+<span class="srcline"><span class="lineno"><a href="1,330" id="srcline330">330</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,331" id="srcline331">331</a></span><span class="line">if isnan(Time)</span></span>
+<span class="srcline"><span class="lineno"><a href="1,332" id="srcline332">332</a></span><span class="line">    Time = -1;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,333" id="srcline333">333</a></span><span class="line">    flag = -1;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,334" id="srcline334">334</a></span><span class="line">end</span></span>
+<span class="srcline"><span class="lineno"><a href="1,335" id="srcline335">335</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,336" id="srcline336">336</a></span><span class="line">if flag == -1</span></span>
+<span class="srcline"><span class="lineno"><a href="1,337" id="srcline337">337</a></span><span class="line">    </span></span>
+<span class="srcline"><span class="lineno"><a href="1,338" id="srcline338">338</a></span><span class="line">    Time  = -1.0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,339" id="srcline339">339</a></span><span class="line">    v     = -1.0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,340" id="srcline340">340</a></span><span class="line">    r     = -1.0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,341" id="srcline341">341</a></span><span class="line">    theta = -1.0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,342" id="srcline342">342</a></span><span class="line">    psi   = -1.0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,343" id="srcline343">343</a></span><span class="line">    </span></span>
+<span class="srcline"><span class="lineno"><a href="1,344" id="srcline344">344</a></span><span class="line">end</span></span>
+<span class="srcline"><span class="lineno"><a href="1,345" id="srcline345">345</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,346" id="srcline346">346</a></span><span class="line">end</span></span>
+<span class="srcline"><span class="lineno"><a href="1,347" id="srcline347">347</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,348" id="srcline348">348</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,349" id="srcline349">349</a></span><span class="line">function EL3 = ELIT3(PHI,HK,C)</span></span>
+<span class="srcline"><span class="lineno"><a href="1,350" id="srcline350">350</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,351" id="srcline351">351</a></span><span class="line"><span class="comment">%       =========================================================</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,352" id="srcline352">352</a></span><span class="line"><span class="comment">%       Purpose: Compute the elliptic integral of the third kind</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,353" id="srcline353">353</a></span><span class="line"><span class="comment">%                using Gauss-Legendre quadrature</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,354" id="srcline354">354</a></span><span class="line"><span class="comment">%       Input :  Phi --- Argument ( in degrees )</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,355" id="srcline355">355</a></span><span class="line"><span class="comment">%                 k  --- Modulus   ( 0 Û k Û 1.0 )</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,356" id="srcline356">356</a></span><span class="line"><span class="comment">%                 c  --- Parameter ( 0 Û c Û 1.0 )</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,357" id="srcline357">357</a></span><span class="line"><span class="comment">%       Output:  EL3 --- Value of the elliptic integral of the</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,358" id="srcline358">358</a></span><span class="line"><span class="comment">%                        third kind</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,359" id="srcline359">359</a></span><span class="line"><span class="comment">%       =========================================================</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,360" id="srcline360">360</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,361" id="srcline361">361</a></span><span class="line">T = [ .9931285991850949,.9639719272779138,...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,362" id="srcline362">362</a></span><span class="line">    .9122344282513259,.8391169718222188,...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,363" id="srcline363">363</a></span><span class="line">    .7463319064601508,.6360536807265150,...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,364" id="srcline364">364</a></span><span class="line">    .5108670019508271,.3737060887154195,...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,365" id="srcline365">365</a></span><span class="line">    .2277858511416451,.7652652113349734E-1];</span></span>
+<span class="srcline"><span class="lineno"><a href="1,366" id="srcline366">366</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,367" id="srcline367">367</a></span><span class="line">W = [ .1761400713915212E-1,.4060142980038694E-1,...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,368" id="srcline368">368</a></span><span class="line">    .6267204833410907E-1,.8327674157670475E-1,...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,369" id="srcline369">369</a></span><span class="line">    .1019301198172404,.1181945319615184,...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,370" id="srcline370">370</a></span><span class="line">    .1316886384491766,.1420961093183820,...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,371" id="srcline371">371</a></span><span class="line">    .1491729864726037,.1527533871307258];</span></span>
+<span class="srcline"><span class="lineno"><a href="1,372" id="srcline372">372</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,373" id="srcline373">373</a></span><span class="line">LB1= isequal(HK,1.0E0) &amp;&amp; (abs(PHI-90.0)&lt;=1.0E-8);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,374" id="srcline374">374</a></span><span class="line">LB2= isequal(C,1.0E0)  &amp;&amp; (abs(PHI-90.0)&lt;=1.0E-8);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,375" id="srcline375">375</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,376" id="srcline376">376</a></span><span class="line">if (LB1 || LB2)</span></span>
+<span class="srcline"><span class="lineno"><a href="1,377" id="srcline377">377</a></span><span class="line">    EL3=NaN;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,378" id="srcline378">378</a></span><span class="line">    return</span></span>
+<span class="srcline"><span class="lineno"><a href="1,379" id="srcline379">379</a></span><span class="line">end</span></span>
+<span class="srcline"><span class="lineno"><a href="1,380" id="srcline380">380</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,381" id="srcline381">381</a></span><span class="line">C1=0.87266462599716E-2*PHI;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,382" id="srcline382">382</a></span><span class="line">C2=C1;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,383" id="srcline383">383</a></span><span class="line">EL3=0.0E0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,384" id="srcline384">384</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,385" id="srcline385">385</a></span><span class="line">for I=1:10</span></span>
+<span class="srcline"><span class="lineno"><a href="1,386" id="srcline386">386</a></span><span class="line">    <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,387" id="srcline387">387</a></span><span class="line">    C0=C2*T(I);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,388" id="srcline388">388</a></span><span class="line">    T1=C1+C0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,389" id="srcline389">389</a></span><span class="line">    T2=C1-C0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,390" id="srcline390">390</a></span><span class="line">    <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,391" id="srcline391">391</a></span><span class="line">    F1=1.0E0/((1.0E0-C*sin(T1)*sin(T1))* ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,392" id="srcline392">392</a></span><span class="line">        sqrt(1.0E0-HK*HK*sin(T1)*sin(T1)));</span></span>
+<span class="srcline"><span class="lineno"><a href="1,393" id="srcline393">393</a></span><span class="line">    <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,394" id="srcline394">394</a></span><span class="line">    F2=1.0E0/((1.0E0-C*sin(T2)*sin(T2))* ...</span></span>
+<span class="srcline"><span class="lineno"><a href="1,395" id="srcline395">395</a></span><span class="line">        sqrt(1.0E0-HK*HK*sin(T2)*sin(T2)));</span></span>
+<span class="srcline"><span class="lineno"><a href="1,396" id="srcline396">396</a></span><span class="line">    <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,397" id="srcline397">397</a></span><span class="line">    EL3=EL3+W(I)*(F1+F2);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,398" id="srcline398">398</a></span><span class="line">    <span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,399" id="srcline399">399</a></span><span class="line">end</span></span>
+<span class="srcline"><span class="lineno"><a href="1,400" id="srcline400">400</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,401" id="srcline401">401</a></span><span class="line">EL3=C1*EL3;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,402" id="srcline402">402</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,403" id="srcline403">403</a></span><span class="line">end</span></span>
+</pre>
+</div>
+<pre class="code">
+<span class="srcline"><span class="lineno"><a href="1,404" id="srcline404">404</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,405" id="srcline405">405</a></span><span class="line"><span class="keyword">function</span>   [<span class="var type1" id="S97T1U2447">FE</span>,<span class="var type1" id="S98T1U2448">EE</span>] = ELIT(<span class="var type1" id="S99T1U2451">HK</span>,<span class="var type1" id="S100T1U2452">PHI</span>)</span></span>
+<span class="srcline"><span class="lineno"><a href="1,406" id="srcline406">406</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,407" id="srcline407">407</a></span><span class="line"><span class="comment">%       ==================================================</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,408" id="srcline408">408</a></span><span class="line"><span class="comment">%       Purpose: Compute complete and incomplete elliptic</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,409" id="srcline409">409</a></span><span class="line"><span class="comment">%                integrals F(k,phi) and E(k,phi)</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,410" id="srcline410">410</a></span><span class="line"><span class="comment">%       Input  : HK  --- Modulus k ( 0 Û k Û 1 )</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,411" id="srcline411">411</a></span><span class="line"><span class="comment">%                Phi --- Argument ( in degrees )</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,412" id="srcline412">412</a></span><span class="line"><span class="comment">%       Output : FE  --- F(k,phi)</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,413" id="srcline413">413</a></span><span class="line"><span class="comment">%                EE  --- E(k,phi)</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,414" id="srcline414">414</a></span><span class="line"><span class="comment">%       ==================================================</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,415" id="srcline415">415</a></span><span class="line"><span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,416" id="srcline416">416</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,417" id="srcline417">417</a></span><span class="line"><span class="mxinfo " id="T1:U5"><span class="var type1" id="S101T1U2455">G</span>  = <span class="mxinfo " id="T1:U7">0.0</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,418" id="srcline418">418</a></span><span class="line"><span class="mxinfo " id="T1:U8"><span class="var type1" id="S102T1U2459">PI</span> = <span class="mxinfo " id="T1:U10">3.14159265358979</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,419" id="srcline419">419</a></span><span class="line"><span class="mxinfo " id="T1:U11"><span class="var type1" id="S103T1U2463">A0</span> = <span class="mxinfo " id="T1:U13">1.0</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,420" id="srcline420">420</a></span><span class="line"><span class="mxinfo " id="T1:U14"><span class="var type1" id="S104T1U2467">B0</span> = <span class="mxinfo " id="T1:U16"><span class="potentialdiff PD1">sqrt(<span class="mxinfo " id="T1:U17"><span class="mxinfo " id="T1:U18">1.0</span>-<span class="mxinfo " id="T1:U19"><span class="var type1" id="S99T1U2473">HK</span>*<span class="var type1" id="S99T1U2474">HK</span></span></span>)</span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,421" id="srcline421">421</a></span><span class="line"><span class="mxinfo " id="T1:U22"><span class="var type1" id="S106T1U2477">D0</span> = <span class="mxinfo " id="T1:U24">(<span class="mxinfo " id="T1:U25"><span class="var type1" id="S102T1U2481">PI</span>/<span class="mxinfo " id="T1:U27">180.0</span></span>)*<span class="var type1" id="S100T1U2483">PHI</span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,422" id="srcline422">422</a></span><span class="line"><span class="mxinfo " id="T1:U29"><span class="var type1" id="S107T1U2486">R</span>  = <span class="mxinfo " id="T1:U31"><span class="var type1" id="S99T1U2488">HK</span>*<span class="var type1" id="S99T1U2489">HK</span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,423" id="srcline423">423</a></span><span class="line"><span class="mxinfo " id="T1:U34"><span class="var type1" id="S108T1U2492">D</span>  = <span class="mxinfo " id="T1:U36">0.0</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,424" id="srcline424">424</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,425" id="srcline425">425</a></span><span class="line"><span class="mxinfo " id="T2:U37"><span class="keyword">if</span> (<span class="mxinfo " id="T2:U38">isequal(<span class="var type1" id="S99T1U2500">HK</span>,<span class="mxinfo " id="T1:U40">1.0</span>)</span> &amp;&amp; <span class="mxinfo " id="T2:U41">isequal(<span class="var type1" id="S100T1U2504">PHI</span>,<span class="mxinfo " id="T1:U43">90.0</span>)</span> )</span></span>
+<span class="srcline"><span class="lineno"><a href="1,426" id="srcline426">426</a></span><span class="line">    <span class="mxinfo " id="T1:U44"><span class="var type1" id="S97T1U2508">FE</span>=<span class="mxinfo " id="T1:U46">NaN</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,427" id="srcline427">427</a></span><span class="line">    <span class="mxinfo " id="T1:U47"><span class="var type1" id="S98T1U2513">EE</span>=<span class="mxinfo " id="T1:U49">1.0</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,428" id="srcline428">428</a></span><span class="line"><span class="keyword">elseif</span> <span class="mxinfo " id="T2:U50">isequal(<span class="var type1" id="S99T1U2518">HK</span>,<span class="mxinfo " id="T1:U52">1.0</span>)</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,429" id="srcline429">429</a></span><span class="line">    <span class="mxinfo " id="T1:U53"><span class="var type1" id="S97T1U2522">FE</span>=<span class="mxinfo " id="T1:U55"><span class="potentialdiff PD1">log(<span class="mxinfo " id="T1:U56">(<span class="mxinfo " id="T1:U57"><span class="mxinfo " id="T1:U58">1.0</span>+<span class="mxinfo " id="T1:U59">sin(<span class="var type1" id="S106T1U2531">D0</span>)</span></span>)/<span class="mxinfo " id="T1:U61">cos(<span class="var type1" id="S106T1U2534">D0</span>)</span></span>)</span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,430" id="srcline430">430</a></span><span class="line">    <span class="mxinfo " id="T1:U63"><span class="var type1" id="S98T1U2537">EE</span>=<span class="mxinfo " id="T1:U65">sin(<span class="var type1" id="S106T1U2540">D0</span>)</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,431" id="srcline431">431</a></span><span class="line"><span class="keyword">else</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,432" id="srcline432">432</a></span><span class="line">    <span class="mxinfo " id="T1:U67"><span class="var type1" id="S114T1U2544">FAC</span>=<span class="mxinfo " id="T1:U69">1.0</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,433" id="srcline433">433</a></span><span class="line">    <span class="keyword">for</span> <span class="var type1" id="S115T1U2548">N</span>=<span class="mxinfo " id="T1:U71">1</span>:40</span></span>
+<span class="srcline"><span class="lineno"><a href="1,434" id="srcline434">434</a></span><span class="line">        <span class="mxinfo " id="T1:U72"><span class="var type1" id="S116T1U2554">A</span>=<span class="mxinfo " id="T1:U74">(<span class="mxinfo " id="T1:U75"><span class="var type1" id="S103T1U2558">A0</span>+<span class="var type1" id="S104T1U2559">B0</span></span>)/<span class="mxinfo " id="T1:U78">2.0</span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,435" id="srcline435">435</a></span><span class="line">        <span class="mxinfo " id="T1:U79"><span class="var type1" id="S117T1U2563">B</span>=<span class="mxinfo " id="T1:U81"><span class="potentialdiff PD1">sqrt(<span class="mxinfo " id="T1:U82"><span class="var type1" id="S103T1U2567">A0</span>*<span class="var type1" id="S104T1U2568">B0</span></span>)</span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,436" id="srcline436">436</a></span><span class="line">        <span class="mxinfo " id="T1:U85"><span class="var type1" id="S118T1U2571">C</span>=<span class="mxinfo " id="T1:U87">(<span class="mxinfo " id="T1:U88"><span class="var type1" id="S103T1U2575">A0</span>-<span class="var type1" id="S104T1U2576">B0</span></span>)/<span class="mxinfo " id="T1:U91">2.0</span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,437" id="srcline437">437</a></span><span class="line">        <span class="mxinfo " id="T1:U92"><span class="var type1" id="S114T1U2580">FAC</span>=<span class="mxinfo " id="T1:U94"><span class="mxinfo " id="T1:U95">2.0</span>*<span class="var type1" id="S114T1U2583">FAC</span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,438" id="srcline438">438</a></span><span class="line">        <span class="mxinfo " id="T1:U97"><span class="var type1" id="S107T1U2586">R</span>=<span class="mxinfo " id="T1:U99"><span class="var type1" id="S107T1U2588">R</span>+<span class="mxinfo " id="T1:U101"><span class="mxinfo " id="T1:U102"><span class="var type1" id="S114T1U2591">FAC</span>*<span class="var type1" id="S118T1U2592">C</span></span>*<span class="var type1" id="S118T1U2593">C</span></span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,439" id="srcline439">439</a></span><span class="line">        <span class="keyword">if</span> <span class="mxinfo " id="T2:U106">~<span class="mxinfo " id="T2:U107">isequal(<span class="var type1" id="S100T1U2599">PHI</span>,<span class="mxinfo " id="T1:U109">90.0</span>)</span></span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,440" id="srcline440">440</a></span><span class="line">            <span class="mxinfo " id="T1:U110"><span class="var type1" id="S108T1U2603">D</span>=<span class="mxinfo " id="T1:U112"><span class="var type1" id="S106T1U2605">D0</span>+<span class="mxinfo " id="T1:U114">atan(<span class="mxinfo " id="T1:U115">(<span class="mxinfo " id="T1:U116"><span class="var type1" id="S104T1U2611">B0</span>/<span class="var type1" id="S103T1U2612">A0</span></span>)*<span class="mxinfo " id="T1:U119">tan(<span class="var type1" id="S106T1U2615">D0</span>)</span></span>)</span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,441" id="srcline441">441</a></span><span class="line">            <span class="mxinfo " id="T1:U121"><span class="var type1" id="S101T1U2618">G</span>=<span class="mxinfo " id="T1:U123"><span class="var type1" id="S101T1U2620">G</span>+<span class="mxinfo " id="T1:U125"><span class="var type1" id="S118T1U2622">C</span>*<span class="mxinfo " id="T1:U127">sin(<span class="var type1" id="S108T1U2625">D</span>)</span></span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,442" id="srcline442">442</a></span><span class="line">            <span class="mxinfo " id="T1:U129"><span class="var type1" id="S106T1U2628">D0</span>=<span class="mxinfo " id="T1:U131"><span class="var type1" id="S108T1U2630">D</span>+<span class="mxinfo " id="T1:U133"><span class="var type1" id="S102T1U2632">PI</span>*<span class="mxinfo " id="T1:U135">floor(<span class="mxinfo " id="T1:U136"><span class="mxinfo " id="T1:U137"><span class="var type1" id="S108T1U2637">D</span>/<span class="var type1" id="S102T1U2638">PI</span></span>+<span class="mxinfo " id="T1:U140">.5</span></span>)</span></span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,443" id="srcline443">443</a></span><span class="line">        <span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,444" id="srcline444">444</a></span><span class="line">        <span class="mxinfo " id="T1:U141"><span class="var type1" id="S103T1U2642">A0</span>=<span class="var type1" id="S116T1U2643">A</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,445" id="srcline445">445</a></span><span class="line">        <span class="mxinfo " id="T1:U144"><span class="var type1" id="S104T1U2646">B0</span>=<span class="var type1" id="S117T1U2647">B</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,446" id="srcline446">446</a></span><span class="line">        <span class="keyword">if</span> (<span class="mxinfo " id="T2:U147"><span class="var type1" id="S118T1U2652">C</span>&lt;<span class="mxinfo " id="T1:U149">1.0e-7</span></span>)</span></span>
+<span class="srcline"><span class="lineno"><a href="1,447" id="srcline447">447</a></span><span class="line">            <span class="keyword">break</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,448" id="srcline448">448</a></span><span class="line">        <span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,449" id="srcline449">449</a></span><span class="line">    <span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,450" id="srcline450">450</a></span><span class="line">    <span class="mxinfo " id="T1:U150"><span class="var type1" id="S122T1U2657">CK</span>=<span class="mxinfo " id="T1:U152"><span class="var type1" id="S102T1U2659">PI</span>/(<span class="mxinfo " id="T1:U154"><span class="mxinfo " id="T1:U155">2.0</span>*<span class="var type1" id="S116T1U2663">A</span></span>)</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,451" id="srcline451">451</a></span><span class="line">    <span class="mxinfo " id="T1:U157"><span class="var type1" id="S123T1U2666">CE</span>=<span class="mxinfo " id="T1:U159"><span class="mxinfo " id="T1:U160"><span class="var type1" id="S102T1U2669">PI</span>*(<span class="mxinfo " id="T1:U162"><span class="mxinfo " id="T1:U163">2.0</span>-<span class="var type1" id="S107T1U2673">R</span></span>)</span>/(<span class="mxinfo " id="T1:U165"><span class="mxinfo " id="T1:U166">4.0</span>*<span class="var type1" id="S116T1U2677">A</span></span>)</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,452" id="srcline452">452</a></span><span class="line">    </span></span>
+<span class="srcline"><span class="lineno"><a href="1,453" id="srcline453">453</a></span><span class="line">    <span class="keyword">if</span> <span class="mxinfo " id="T2:U168">isequal(<span class="var type1" id="S100T1U2682">PHI</span>,<span class="mxinfo " id="T1:U170">90.0</span>)</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,454" id="srcline454">454</a></span><span class="line">        <span class="mxinfo " id="T1:U171"><span class="var type1" id="S97T1U2686">FE</span>=<span class="var type1" id="S122T1U2687">CK</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,455" id="srcline455">455</a></span><span class="line">        <span class="mxinfo " id="T1:U174"><span class="var type1" id="S98T1U2690">EE</span>=<span class="var type1" id="S123T1U2691">CE</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,456" id="srcline456">456</a></span><span class="line">    <span class="keyword">else</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,457" id="srcline457">457</a></span><span class="line">        <span class="mxinfo " id="T1:U177"><span class="var type1" id="S97T1U2695">FE</span>=<span class="mxinfo " id="T1:U179"><span class="var type1" id="S108T1U2697">D</span>/(<span class="mxinfo " id="T1:U181"><span class="var type1" id="S114T1U2700">FAC</span>*<span class="var type1" id="S116T1U2701">A</span></span>)</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,458" id="srcline458">458</a></span><span class="line">        <span class="mxinfo " id="T1:U184"><span class="var type1" id="S98T1U2704">EE</span>=<span class="mxinfo " id="T1:U186"><span class="mxinfo " id="T1:U187"><span class="mxinfo " id="T1:U188"><span class="var type1" id="S97T1U2708">FE</span>*<span class="var type1" id="S123T1U2709">CE</span></span>/<span class="var type1" id="S122T1U2710">CK</span></span>+<span class="var type1" id="S101T1U2711">G</span></span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,459" id="srcline459">459</a></span><span class="line">    <span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,460" id="srcline460">460</a></span><span class="line">    </span></span>
+<span class="srcline"><span class="lineno"><a href="1,461" id="srcline461">461</a></span><span class="line"><span class="keyword">end</span></span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,462" id="srcline462">462</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,463" id="srcline463">463</a></span><span class="line"><span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,464" id="srcline464">464</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,465" id="srcline465">465</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,466" id="srcline466">466</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,467" id="srcline467">467</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,468" id="srcline468">468</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,469" id="srcline469">469</a></span><span class="line"></span></span>
+</pre>
+</body>
+</html>
