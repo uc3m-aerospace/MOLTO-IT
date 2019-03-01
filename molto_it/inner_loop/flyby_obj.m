@@ -17,9 +17,7 @@ function [DV,aux] = flyby_obj(x,setup)
 %    Function that provides the total DV consumed during a flyby leg type
 %
 %--------------------------------------------------------------------------
-lc  = 149597870.700e03;
-mu  = 132712440018e09;
-tc  = sqrt(lc^3/mu);
+mu = setup.mu;
 %
 % Initial spiral position
 %

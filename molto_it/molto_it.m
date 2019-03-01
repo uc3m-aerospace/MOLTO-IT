@@ -67,11 +67,6 @@ while n_fb_min > 0
   %
 end
 %
-%fbb_min   = [3 2 ];
-%fbb_max   = [3 2 ];
-ToF_min   = [50  50  50  50 ];
-ToF_max   = [500 500 500 1000];
-%
 % Set Min/Max Values for the initial date
 %
 t0_min = 0;
@@ -164,7 +159,7 @@ options.crossover  = {'intermediate', 0.5};     % crossover operator (Ratio=1.2)
 options.mutation   = {'gaussian',0.1, 0.2};     % mutation operator (scale=0.1(deviation of the random number), shrink=0.5)--> for example, shrink?[0.5, 1.0]) is usually used for local search. A large mutation range (shrink == 0) is require getting out of the local Pareto-optimal fronts
 options.crossoverFraction = 0.8;                % crossover fraction of variables of an individual ( 2/numVar )-->only crossoverFraction of all variables would do crossover
 options.mutationFraction  = 0.3;                % only mutaionFraction of all variables would do mutation (default 2/numvar)
-options.objfun            = @fitness_nsg2;      % objective function handle
+options.objfun            = @fitness_nsga2;      % objective function handle
 options.plotInterval      = 1;                  % interval between two calls of "plotnsga". 
 options.outputInterval    = 1; 
 options.outputfile        = input.output_file;  %outputfile

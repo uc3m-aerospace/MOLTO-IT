@@ -1,26 +1,24 @@
 %--------------------------------------------------------------------------
 function [c,ceq] = flyby_cons(x,setup)
 %--------------------------------------------------------------------------
-%	MOLTO-IT Software Computation Core										
-%																			
-%	This program is developed at the Universidad Carlos III de Madrid,		
-%   as part of a PhD program.										
-%																			
-%   The software and its components are developed by David Morante González															
-%																		
+%	MOLTO-IT Software Computation Core
+%
+%	This program is developed at the Universidad Carlos III de Madrid,
+%   as part of a PhD program.
+%
+%   The software and its components are developed by David Morante González
+%
 %   The program is released under the MIT License
 %
-%   Copyright (c) 2019 David Morante González															
-%																			
+%   Copyright (c) 2019 David Morante González
+%
 %--------------------------------------------------------------------------
 %
-%    Function that provides the infeasability of the constraints (equality 
+%    Function that provides the infeasability of the constraints (equality
 %    and inequality) for  a flyby type leg
 %
 %--------------------------------------------------------------------------
-lc  = 149597870.700e03;
-mu  = 132712440018e09;
-tc  = sqrt(lc^3/mu);
+mu = setup.mu;
 %
 % Initial spiral position
 %
@@ -47,12 +45,12 @@ ToF                   = setup.ToF + x(2);
 % Ensure thetaf > theta0
 %
 while( thetaf < theta0 )
-   thetaf = thetaf + 2*pi;        
+    thetaf = thetaf + 2*pi;
 end
 %
 thetaf = thetaf + 2*pi*setup.n;
 %
-ee1 = x(1);  
+ee1 = x(1);
 ee2 = 0;
 xA  = x(3);
 %
@@ -66,20 +64,16 @@ if numel(x)>5
 end
 %
 %------------------------------------------------------------------
-% FIRST SPIRAL ARC 
+% FIRST SPIRAL ARC
 %------------------------------------------------------------------
 %
-[t1, v, r, theta, psi ] = propagate_spirals_try_mex(v0,r0,theta0,psi0,thetaA,ee1) ; 
+[t1, v, r, theta, psi ] = propagate_spirals_mex(v0,r0,theta0,psi0,thetaA,ee1) ;
 %
 coast_arc()
 %
 if numel(x)>5
     %
-   % if setup.type == 1
-   %     ee2 = (2*a(end)-rf*(1+a(end)*vf^2))*r(end)/(2*a(end)*(r(end)-rf));   
-   % end
-    %
-    [t2, v, r, ~, psi ] = propagate_spirals_try_mex( v,r, thetaB, psi, thetaf, ee2);
+    [t2, v, r, ~, psi ] = propagate_spirals_mex( v,r, thetaB, psi, thetaf, ee2);
     tk = tk + t2;
     %
 end
@@ -93,9 +87,8 @@ ToF_spiral = t1 + tk;
 c(1) = -ToF;
 %
 if setup.type == 2
-    v1 = v(end)*cos(psi(end)) - vf*cos(psif);
-    v2 = v(end)*sin(psi(end)) - vf*sin(psif);
-    
+    v1   = v(end)*cos(psi(end)) - vf*cos(psif);
+    v2   = v(end)*sin(psi(end)) - vf*sin(psif);
     c(2) =  -setup.vinff_max^2 +v1^2+v2^2;
 end
 %
@@ -103,16 +96,16 @@ ceq(1) = (r(end)     - rf)/1;
 ceq(2) = (ToF_spiral - ToF)/1;
 %
 if setup.type == 1
-   %
-   ceq(3) = (v(end) - vf);
-   ceq(4) = (psi(end) - psif)/1;
-   %
+    %
+    ceq(3) = (v(end) - vf);
+    ceq(4) = (psi(end) - psif)/1;
+    %
 end
 %
 if ~isreal(ToF_spiral) || isnan(ToF_spiral)
-%
-ceq = NaN *ones(size(ceq));
-%
+    %
+    ceq = NaN *ones(size(ceq));
+    %
 end
 
 

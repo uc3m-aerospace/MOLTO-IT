@@ -1,28 +1,25 @@
 %--------------------------------------------------------------------------
 function [c,ceq] = departure_cons(x,setup)
 %--------------------------------------------------------------------------
-%	MOLTO-IT Software Computation Core										
-%																			
-%	This program is developed at the Universidad Carlos III de Madrid,		
-%   as part of a PhD program.										
-%																			
-%   The software and its components are developed by David Morante González															
-%																		
+%	MOLTO-IT Software Computation Core
+%
+%	This program is developed at the Universidad Carlos III de Madrid,
+%   as part of a PhD program.
+%
+%   The software and its components are developed by David Morante González
+%
 %   The program is released under the MIT License
 %
-%   Copyright (c) 2019 David Morante González															
-%																			
+%   Copyright (c) 2019 David Morante González
+%
 %--------------------------------------------------------------------------
 %
-%    Function that provides the infeasability of the constraints (equality 
+%    Function that provides the infeasability of the constraints (equality
 %    and inequality) for a departure type leg
 %
 %--------------------------------------------------------------------------
 %
-lc  = 149597870.700e03;
-mu  = 132712440018e09;
-tc  = sqrt(lc^3/mu);
-vc  = lc/tc;
+tc  = setup.tc;
 %
 %Compute Initial date and Flight Time
 %
@@ -43,32 +40,18 @@ ToF        = setup.ToF + ToF1+ x(2);
 %
 % Add Launch velocity
 %
-%if strcmp(setup.planet1,setup.planet2)
-    %
-    v1   = v0*cos(psi0) + setup.vinf0*1e3/vc*cos(x(5));
-    v2   = v0*sin(psi0) + setup.vinf0*1e3/vc*sin(x(5));
-    v0   = norm([v1,v2]);
-    psi0 = atan2(v2,v1);
-    
-% elseif rf > r0
-%     
-%    v0   = v0 + setup.vinf0*1e3/vc;
-%     
-% else
-%     
-%    v0   = v0 - setup.vinf0*1e3/vc;
-%     
-% end
-%
-% Ensure thetaf > theta0
+v1   = v0*cos(psi0) + setup.vinf0*cos(x(5));
+v2   = v0*sin(psi0) + setup.vinf0*sin(x(5));
+v0   = norm([v1,v2]);
+psi0 = atan2(v2,v1);
 %
 while( thetaf < theta0 )
-   thetaf = thetaf + 2*pi;        
+    thetaf = thetaf + 2*pi;
 end
 %
 thetaf = thetaf + 2*pi*setup.n;
 %
-ee1 = x(1);  
+ee1 = x(1);
 ee2 = 0;
 xA  = x(3);
 %
@@ -82,18 +65,18 @@ if setup.type == 1
 end
 %
 %------------------------------------------------------------------
-% FIRST SPIRAL ARC 
+% FIRST SPIRAL ARC
 %------------------------------------------------------------------
 %
-[t1, v, r, theta, psi ] = propagate_spirals_try_mex(v0,r0,theta0,psi0,thetaA,ee1) ; 
+[t1, v, r, theta, psi ] = propagate_spirals_mex(v0,r0,theta0,psi0,thetaA,ee1) ;
 %
 coast_arc()
-
+%
 if setup.type >0
-%
-[t2, v, r, ~, psi ] = propagate_spirals_try_mex( v,r, thetaB, psi, thetaf, ee2);
-tk = tk + t2;
-%
+    %
+    [t2, v, r, ~, psi ] = propagate_spirals_mex( v,r, thetaB, psi, thetaf, ee2);
+    tk = tk + t2;
+    %
 end
 %
 %------------------------------------------------------------------
@@ -102,7 +85,6 @@ end
 %
 ToF_spiral = t1 + tk;
 %
-%c = -x(2);
 c = -ToF;
 %
 if setup.type == 2
@@ -112,20 +94,20 @@ if setup.type == 2
     c = -setup.vinff_max + sqrt(v1^2+v2^2);
 end
 %
-ceq(1) = (r(end)     - rf)/1;
-ceq(2) = (ToF_spiral - ToF)/1;
+ceq(1) = (r(end)     - rf);
+ceq(2) = (ToF_spiral - ToF);
 %
 if setup.type == 1
-   %
-   ceq(3) = (v(end) - vf);
-   ceq(4) = (psi(end) - psif);
-   %
+    %
+    ceq(3) = (v(end) - vf);
+    ceq(4) = (psi(end) - psif);
+    %
 end
 %
 if ~isreal(ToF_spiral) || isnan(ToF_spiral)
-%
-ceq = NaN *ones(size(ceq));
-%
+    %
+    ceq = NaN *ones(size(ceq));
+    %
 end
 
 

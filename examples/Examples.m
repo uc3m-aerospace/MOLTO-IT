@@ -1,18 +1,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%   MAIN PROGRAM FOR MOLTO-IT
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clear all ;
-close all ;
-fclose all;
-addpath('./lib/')
-addpath('./lib/Auxiliar')
-addpath('/Users/davidmorante/Desktop/SOLVERS/NGPM')
-addpath('/Users/davidmorante/Desktop/MicePackage')
+%   MOLTO-IT TEST CASES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Name of the Problem to be loaded
 %
-example = 'Jupiter';
+example = 'Ceres';
 %
 %planets = [ {'1'}   % mercury
 %            {'2'}   % venus
@@ -25,33 +17,8 @@ example = 'Jupiter';
 %            {'9'}   % pluton
           
 switch(example)
-    %
-    case'Caesar_earth_default2'
-        %
-        problem_name  = example;
-        problem_type  = 'rendezvous2';
-        planet_dep    = '1000012';
-        planet_arr    = '3';
-        vinf0_max     =  0;
-        vinff_max     =  6.7;
-        planet_fb     = {'2','3'};
-        rfb_min       = 600;
-        n_fb          = [2,4];
-        ToF           = [300,2000];
-        rev           = [0,1];
-        Initial_Date  = [{'2033 Nov 1 00:00:00'},{'2034 Apr 30 00:00:00'}];
-        %load([problem_name,'.mat'])
-        output_file   = [problem_name,'.txt'];
-        init_file     = [problem_name,'.txt'];
-        init_file     = [];
-        %load(['Caesar_1Flyby.mat'])
-        plot          = 0;
-        useParallel   = 'no';
-        maxGen        = 200;
-        popsize       = 50;
-        %
-        
-    case'Mars'
+    %       
+    case'Ceres'
         
         problem_name  = example;
         problem_type  = 'rendezvous';
@@ -67,7 +34,7 @@ switch(example)
         init_file     = [];
         output_file   = [problem_name,'.txt'];
         plot          = 0;
-        useParallel   = 'yes';
+        useParallel   = 'no';
         options       = [];
         maxGen        = 200;
         popsize       = 50;
@@ -80,11 +47,12 @@ switch(example)
         planet_arr    = 'Jupiter';
         vinf0_max     =  2;
         planet_fb     = [{'4'},{'3'},{'2'},{'4'},{'3'},{'2'}];
-        %planet_fb     = [{'Venus'}];
         rfb_min       = 200;
         n_fb          = [0,3];
         rev           = [0,0];
         ToF           = [50,1000];
+        ToF_min       = [50  50  50  50 ];
+        ToF_max       = [500 500 500 1000];
         Initial_Date  = [{'2029 Jan 01 00:00:00'},{'2030 Dec 31 00:00:00'}];
         init_file     = [];
         output_file   = [problem_name,'.txt'];

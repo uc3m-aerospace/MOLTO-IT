@@ -1,27 +1,24 @@
 %--------------------------------------------------------------------------
 function [DV, aux] = departure_obj(x,setup)
 %--------------------------------------------------------------------------
-%	MOLTO-IT Software Computation Core										
-%																			
-%	This program is developed at the Universidad Carlos III de Madrid,		
-%   as part of a PhD program.										
-%																			
-%   The software and its components are developed by David Morante González															
-%																		
+%	MOLTO-IT Software Computation Core
+%
+%	This program is developed at the Universidad Carlos III de Madrid,
+%   as part of a PhD program.
+%
+%   The software and its components are developed by David Morante González
+%
 %   The program is released under the MIT License
 %
-%   Copyright (c) 2019 David Morante González															
-%																			
+%   Copyright (c) 2019 David Morante González
+%
 %--------------------------------------------------------------------------
 %
 %    Function that provides the total DV consumed during a departure leg type
 %
 %--------------------------------------------------------------------------
 %
-lc  = 149597870.700e03;
-mu  = 132712440018e09;
-tc  = sqrt(lc^3/mu);
-vc  = lc/tc;
+tc  = setup.tc;
 %
 %Compute Initial date and Flight Time
 %
@@ -43,21 +40,21 @@ ToF        = setup.ToF + ToF1+ x(2);
 % Add Launch velocity
 %
 %if strcmp(setup.planet1,setup.planet2)
-    %
-    v1   = v0*cos(psi0) + setup.vinf0*1e3/vc*cos(x(5));
-    v2   = v0*sin(psi0) + setup.vinf0*1e3/vc*sin(x(5));
-    v0   = norm([v1,v2]);
-    psi0 = atan2(v2,v1);
+%
+v1   = v0*cos(psi0) + setup.vinf0*cos(x(5));
+v2   = v0*sin(psi0) + setup.vinf0*sin(x(5));
+v0   = norm([v1,v2]);
+psi0 = atan2(v2,v1);
 %
 % Ensure thetaf > theta0
 %
 while( thetaf < theta0 )
-   thetaf = thetaf + 2*pi;        
+    thetaf = thetaf + 2*pi;
 end
 %
 thetaf = thetaf + 2*pi*setup.n;
 %
-ee1 = x(1);  
+ee1 = x(1);
 ee2 = 0;
 xA  = x(3);
 %
@@ -90,7 +87,7 @@ aux.vsp     = vsp;
 aux.psisp   = psisp;
 aux.vp      = vf;
 aux.psip    = psif;
-aux.ToF     = ToF; 
+aux.ToF     = ToF;
 aux.et_fact = et0_factor;
 aux.et      = et02;
 %%--------------------------------------------------------------------------

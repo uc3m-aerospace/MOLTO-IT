@@ -1,17 +1,17 @@
 %--------------------------------------------------------------------------
 function[DV,out,flag] = departure_spiral(planet1,planet2,et0,ToF,type,aux)
 %--------------------------------------------------------------------------
-%	MOLTO-IT Software Computation Core										
-%																			
-%	This program is developed at the Universidad Carlos III de Madrid,		
-%   as part of a PhD program.										
-%																			
-%   The software and its components are developed by David Morante González															
-%																		
+%	MOLTO-IT Software Computation Core
+%
+%	This program is developed at the Universidad Carlos III de Madrid,
+%   as part of a PhD program.
+%
+%   The software and its components are developed by David Morante González
+%
 %   The program is released under the MIT License
 %
-%   Copyright (c) 2019 David Morante González															
-%																			
+%   Copyright (c) 2019 David Morante González
+%
 %--------------------------------------------------------------------------
 %
 %    Function that solve the low-thrust interplanetary transfer problem
@@ -19,20 +19,16 @@ function[DV,out,flag] = departure_spiral(planet1,planet2,et0,ToF,type,aux)
 %    and is to flyby or rendezvous planet2
 %
 %--------------------------------------------------------------------------
-lc  = 149597870.700e03;
-mu  = 132712440018e09;
-tc  = sqrt(lc^3/mu);
+tc  = aux.tc;
+lc  = aux.lc;
+mu  = aux.mu;
 %%--------------------------------------------------------------------------
-setup.planet1      = planet1;
-setup.planet2      = planet2;
-setup.et0          = et0;
-setup.ToF          = ToF/(tc)*(3600*24);
-setup.initial_date = aux.initial_date;
-setup.final_date   = aux.final_date;
-setup.xind         = aux.xind;
-setup.vinf0        = aux.vinf0;
-setup.type         = type;
-setup.n            = 0;
+aux.planet1      = planet1;
+aux.planet2      = planet2;
+aux.et0          = et0;
+aux.ToF          = ToF/(tc)*(3600*24);
+aux.type         = type;
+aux.n            = 0;
 %--------------------------------------------------------------------------
 % Orbital Elements for Departure planet
 %--------------------------------------------------------------------------
@@ -45,7 +41,7 @@ oe0.LNODE = O(4);
 oe0.ARGP  = O(5);
 oe0.SMA   = O(1)/(1-oe0.ECC)*1e3/lc;
 oe0.M0    = O(6);
-setup.oe0 = oe0;
+aux.oe0   = oe0;
 %--------------------------------------------------------------------------
 % Orbital Elements for Arrival planet
 %--------------------------------------------------------------------------
@@ -58,7 +54,7 @@ oe.LNODE = O(4);
 oe.ARGP  = O(5);
 oe.SMA   = O(1)/(1-oe.ECC)*1e3/lc;
 oe.M0    = O(6);
-setup.oe = oe;
+aux.oe = oe;
 %
 % Guess for time
 %
@@ -94,7 +90,7 @@ try
     x0 = [0.3, 0, 0.1, 0, psi0];
     %
     if type == 2
-        setup.vinff_max = aux.vinff_max;
+        aux.vinff_max = aux.vinff_max;
     end
     %
     if type == 1 || type == 2
@@ -104,9 +100,9 @@ try
         x0 = [x0 0.4 0.99];
     end
     %
-    NONLCON = @(x)departure_cons(x,setup);
+    NONLCON = @(x)departure_cons(x,aux);
     %
-    [x,~,exitflag] = fmincon(@(x)departure_obj(x,setup),x0,[],[],[],[],lb,ub,NONLCON,options);
+    [x,~,exitflag] = fmincon(@(x)departure_obj(x,aux),x0,[],[],[],[],lb,ub,NONLCON,options);
 catch
     %
     x = x0;
@@ -114,7 +110,7 @@ catch
     %
 end
 %
-[c,ceq]  = departure_cons(x,setup);
+[c,ceq]  = departure_cons(x,aux);
 %
 if exitflag <= 0 ||(norm(ceq) > 1e-2)
     try
@@ -124,7 +120,7 @@ if exitflag <= 0 ||(norm(ceq) > 1e-2)
         x0 = [0.5, 0, 0.2, 0, psi0 ];
         %
         if type == 2
-            setup.vinff_max = aux.vinff_max;
+            aux.vinff_max = aux.vinff_max;
         end
         %
         if type == 1 || type == 2
@@ -133,9 +129,9 @@ if exitflag <= 0 ||(norm(ceq) > 1e-2)
             x0 = [x0 0.4 0.99];
         end
         %
-        NONLCON = @(x)departure_cons(x,setup);
+        NONLCON = @(x)departure_cons(x,aux);
         %
-        [x,~,exitflag] = fmincon(@(x)departure_obj(x,setup),x0,[],[],[],[],lb,ub,NONLCON,options);
+        [x,~,exitflag] = fmincon(@(x)departure_obj(x,aux),x0,[],[],[],[],lb,ub,NONLCON,options);
     catch
         %
         x = x0;
@@ -145,7 +141,7 @@ if exitflag <= 0 ||(norm(ceq) > 1e-2)
     
 end
 %
-[c,ceq]  = departure_cons(x,setup);
+[c,ceq]  = departure_cons(x,aux);
 %
 if exitflag <= 0 ||(norm(ceq) > 1e-2)
     %
@@ -156,13 +152,13 @@ if exitflag <= 0 ||(norm(ceq) > 1e-2)
     %
 else
     %
-         flag     = 0;
+    flag     = 0;
     if aux.plot == 0
-        [DV,out] = departure_obj(x,setup);
+        [DV,out] = departure_obj(x,aux);
     else
-        departure_cons(x,setup)
-        [DV,out] = departure_plot(x,setup);
-        [DV,out] = departure_obj(x,setup);
+        departure_cons(x,aux)
+        [DV,out] = departure_plot(x,aux);
+        [DV,out] = departure_obj(x,aux);
         out.et_fact
         cspice_et2utc(out.et,'C',0)
     end
