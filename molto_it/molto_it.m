@@ -49,8 +49,19 @@ input.planets    = planet_fb;
 %
 % Set Min/Max Values for the flight times
 %
-ToF_min   = input.ToF(1)*ones( 1 , n_fb_max + 1 );
-ToF_max   = input.ToF(2)*ones( 1 , n_fb_max + 1 );
+if numel(input.ToF) ==2
+    ToF_min   = input.ToF(1)*ones( 1 , n_fb_max + 1 );
+    ToF_max   = input.ToF(2)*ones( 1 , n_fb_max + 1 );
+else
+    ToF_min   = input.ToF(1,:);
+    ToF_max   = input.ToF(2,:);
+end
+%
+% Check consistency in input results
+%
+if ~isequal(numel(ToF_min),n_fb_max + 1) || ~isequal(numel(ToF_max),n_fb_max + 1)
+    error('Check consistency in input vector')
+end
 %
 % Set Min/Max Values for the flyby bodies
 %
@@ -176,12 +187,12 @@ end
 %
 if strcmp(options.useParallel,'no')
     %
-    load_spice_kernels('/Users/davidmorante/Desktop/MicePackage/');
+    load_spice_kernels(input.spice_dir);
 else
     %
     parfor jj  = 1:4
         %
-        load_spice_kernels('/Users/davidmorante/Desktop/MicePackage/');
+        load_spice_kernels(input.spice_dir);
         %
     end
     %
