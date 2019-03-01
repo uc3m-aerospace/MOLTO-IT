@@ -7,15 +7,27 @@
 clear all ;
 close all ;
 fclose all;
-addpath('./Code/')
-addpath('./Code/Auxiliar')
-
+addpath('./lib/')
+addpath('./lib/Auxiliar')
+addpath('/Users/davidmorante/Desktop/SOLVERS/NGPM')
+%addpath('/Users/davidmorante/Desktop/moiseevigor-elliptic-348471b')
+addpath('/Users/davidmorante/Desktop/MicePackage')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Name of the Problem to be loaded
 %
-example = 'Caesar_earth_default2';
+example = 'Jupiter';
 %
+%planets = [ {'1'}   % mercury
+%            {'2'}   % venus
+%            {'3'}   % earth
+%            {'4'}   % mars
+%            {'5'}   % jupiter
+%            {'6'}   % saturno
+%            {'7'}   % urano
+%            {'8'}   % neptuno
+%            {'9'}   % pluton
+          
 switch(example)
     %
     case'Caesar_earth_default2'
@@ -26,10 +38,11 @@ switch(example)
         planet_arr    = '3';
         vinf0_max     =  0;
         vinff_max     =  6.7;
-        planet_fb     = {'3'};
+        planet_fb     = {'2','3'};
         rfb_min       = 600;
-        n_fb          = [1,1];
+        n_fb          = [2,4];
         ToF           = [300,2000];
+        rev           = [0,1];
         Initial_Date  = [{'2033 Nov 1 00:00:00'},{'2034 Apr 30 00:00:00'}];
         %load([problem_name,'.mat'])
         output_file   = [problem_name,'.txt'];
@@ -37,31 +50,9 @@ switch(example)
         init_file     = [];
         %load(['Caesar_1Flyby.mat'])
         plot          = 0;
-        useParallel   = 'yes';
-        options       = [];
-        %
-       
-    case 'Caesar_1yearlater_2Flybys'
-        %
-        problem_name  = example;
-        problem_type  = 'rendezvous2';
-        planet_dep    = '67P';
-        planet_arr    = '3';
-        vinf0_max     =  0;
-        vinff_max     =  6.7;
-        planet_fb     = {'2','3'};
-        rfb_min       = 600;
-        n_fb          = [3,3];
-        ToF           = [200,1700];
-        Initial_Date  = [{'2034 Nov 1 00:00:00'},{'2034 Dec 1 00:00:00'}];
-        output_file   = [problem_name,'.txt'];
-        init_file     = [problem_name,'.txt'];
-        init_file     = [];
-        load([problem_name,'.mat'])
-        %load(['Caesar_samedate.mat'])
-        plot          = 0;
-        useParallel   = 'yes';
-        options       = [];
+        useParallel   = 'no';
+        maxGen        = 200;
+        popsize       = 50;
         %
         
     case'Mars'
@@ -74,13 +65,16 @@ switch(example)
         planet_fb     = {'4'};
         rfb_min       = 200;
         n_fb          = [0,1];
+        rev           = [0,0];
         ToF           = [100,1000];
         Initial_Date  = [{'2003 Jan 01 00:00:00'},{'2003 Dec 31 00:00:00'}];
         init_file     = [];
         output_file   = [problem_name,'.txt'];
         plot          = 0;
-        useParallel   = 'no';
+        useParallel   = 'yes';
         options       = [];
+        maxGen        = 200;
+        popsize       = 50;
         
     case'Jupiter'
         
@@ -89,22 +83,26 @@ switch(example)
         planet_dep    = 'Earth';
         planet_arr    = 'Jupiter';
         vinf0_max     =  2;
-        planet_fb     = [{'Mars'},{'Earth'},{'Venus'},{'Mars'},{'Earth'},{'Venus'}];
+        planet_fb     = [{'4'},{'3'},{'2'},{'4'},{'3'},{'2'}];
+        %planet_fb     = [{'Venus'}];
         rfb_min       = 200;
-        n_fb          = [3,3];
-        ToF           = [100,1000];
-        Initial_Date  = [{'2029 Jan 01 00:00:00'},{'2029 Dec 31 00:00:00'}];
+        n_fb          = [0,3];
+        rev           = [0,0];
+        ToF           = [50,1000];
+        Initial_Date  = [{'2029 Jan 01 00:00:00'},{'2030 Dec 31 00:00:00'}];
         init_file     = [];
         output_file   = [problem_name,'.txt'];
         plot          = 0;
         useParallel   = 'yes';
         options       = [];
+        maxGen        = 200;
+        popsize       = 200;
                
      case'BepiColombo'
         
         problem_name  = example;        
         problem_type  = 'rendezvous';
-        planet_dep    = 'Earth';
+        planet_dep     = 'Earth';
         planet_arr    = 'Mercury';
         vinf0_max     =  3.36;
         planet_fb     = [{'Mercury'},{'Earth'},{'Venus'}];
@@ -165,7 +163,7 @@ save(example);
 input = load(example);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-output       = genetic_problem(input,options);
+output       = molto_it(input);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

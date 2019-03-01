@@ -32,16 +32,6 @@ ToF        = setup.ToF + ToF1+ x(2);
     v2   = v0*sin(psi0) + setup.vinf0*1e3/vc*sin(x(5));
     v0   = norm([v1,v2]);
     psi0 = atan2(v2,v1);
-    
-% elseif rf > r0
-%     
-%    v0   = v0 + setup.vinf0*1e3/vc;
-%     
-% else
-%     
-%    v0   = v0 - setup.vinf0*1e3/vc;
-%     
-% end
 %
 % Ensure thetaf > theta0
 %
@@ -76,20 +66,17 @@ setup.thetaf = thetaf;
 %
 % Obtain DV
 %
-[DV, vsp, psisp, DVp] = get_DV(setup);
+[DV, vsp, psisp] = get_DV(setup);
 %
-DV = DV + DVp*10;
-%
-aux.thetasp  = thetaf;
-aux.rsp      = rf;
-aux.vsp      = vsp;
-aux.psisp    = psisp;
-aux.vp       = vf;
-aux.psip     = psif;
-aux.ToF      = ToF; 
-aux.ToF_year = ToF*tc/(365*24*3600); 
-aux.et_fact  = et0_factor;
-aux.et       = et02;
+aux.thetasp = thetaf;
+aux.rsp     = rf;
+aux.vsp     = vsp;
+aux.psisp   = psisp;
+aux.vp      = vf;
+aux.psip    = psif;
+aux.ToF     = ToF; 
+aux.et_fact = et0_factor;
+aux.et      = et02;
 %%--------------------------------------------------------------------------
 
 

@@ -6,7 +6,6 @@ lc  = 149597870.700e03;
 mu  = 132712440018e09;
 tc  = sqrt(lc^3/mu);
 vc  = lc/tc;
-ac  = vc/tc;
 %
 %Compute Initial date and Flight Time
 %
@@ -28,12 +27,22 @@ ToF        = setup.ToF + ToF1+ x(2);
 % Add Launch velocity
 %
 %if strcmp(setup.planet1,setup.planet2)
+    %
+    v1   = v0*cos(psi0) + setup.vinf0*1e3/vc*cos(x(5));
+    v2   = v0*sin(psi0) + setup.vinf0*1e3/vc*sin(x(5));
+    v0   = norm([v1,v2]);
+    psi0 = atan2(v2,v1);
+    
+% elseif rf > r0
+%     
+%    v0   = v0 + setup.vinf0*1e3/vc;
+%     
+% else
+%     
+%    v0   = v0 - setup.vinf0*1e3/vc;
+%     
+% end
 %
-v1   = v0*cos(psi0) + setup.vinf0*1e3/vc*cos(x(5));
-v2   = v0*sin(psi0) + setup.vinf0*1e3/vc*sin(x(5));
-v0   = norm([v1,v2]);
-psi0 = atan2(v2,v1);  
-% 
 % Ensure thetaf > theta0
 %
 while( thetaf < theta0 )
@@ -62,12 +71,11 @@ end
 [t1, v, r, theta, psi ] = propagate_spirals_try_mex(v0,r0,theta0,psi0,thetaA,ee1) ; 
 %
 coast_arc()
-%
-t2 = 0;
-%
+
 if setup.type >0
 %
-[t2, v, r, ~, psi ]    = propagate_spirals_try_mex( v,r, thetaB, psi, thetaf, ee2);
+[t2, v, r, ~, psi ] = propagate_spirals_try_mex( v,r, thetaB, psi, thetaf, ee2);
+tk = tk + t2;
 %
 end
 %
@@ -75,22 +83,11 @@ end
 % COMPUTE CONSTRAINTS
 %------------------------------------------------------------------
 %
-ToF_spiral = t1 + tk + t2;
+ToF_spiral = t1 + tk;
 %
 %c = -x(2);
-c = 0;
+c = -ToF;
 %
-%  T_available = thrust_model(r0);
-% % 
-%  at0  = 1 ./ r0.^2 .* sqrt( ee1^2 * cos(psi0).^2 + ( 1 - 2 * ee1 )^2 * sin(psi0).^2 );
-% % 
-%  if  ee1^2 * cos(psi0).^2 + ( 1 - 2 * ee1 )^2 * sin(psi0).^2 < 0
-%     at0 = NaN;
-%  end
-% % 
-%  c    = -(1*T_available/ac - at0);
-
-
 if setup.type == 2
     v1 = v(end)*cos(psi(end)) - vf*cos(psif);
     v2 = v(end)*sin(psi(end)) - vf*sin(psif);
@@ -108,7 +105,7 @@ if setup.type == 1
    %
 end
 %
-if ~isreal(ToF_spiral) || isnan(ToF_spiral) || isequal(t1,-1) || isequal(t2,-1)
+if ~isreal(ToF_spiral) || isnan(ToF_spiral)
 %
 ceq = NaN *ones(size(ceq));
 %

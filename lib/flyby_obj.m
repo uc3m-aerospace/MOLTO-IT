@@ -47,8 +47,6 @@ if numel(x)>5
     ee2      = x(5);
     xB       = x(6);
     thetaB   = xB*(thetaf-thetaA) + thetaA;
-    setup.vf = vf;
-    setup.rf = rf;
 end
 %
 setup.ee1    = ee1;
@@ -67,14 +65,13 @@ setup.thetaf = thetaf;
 %
 [DV, vsp, psisp] = get_DV(setup);
 %
-aux.thetasp  = thetaf;
-aux.rsp      = rf;
-aux.vsp      = vsp;
-aux.psisp    = psisp;
-aux.vp       = vf;
-aux.psip     = psif;
-aux.ToF      = ToF; 
-aux.ToF_year = ToF*tc/(365*24*3600); 
+aux.thetasp = thetaf;
+aux.rsp     = rf;
+aux.vsp     = vsp;
+aux.psisp   = psisp;
+aux.vp      = vf;
+aux.psip    = psif;
+aux.ToF     = ToF; 
 %
 
 
