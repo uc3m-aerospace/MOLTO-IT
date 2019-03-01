@@ -24,7 +24,7 @@ switch(example)
         problem_name  = example;
         problem_type  = 'rendezvous';
         planet_dep    = 'Earth';
-        planet_arr    = 'Ceres';
+        planet_arr    = '2000001'; %Ceres
         vinf0_max     =  1.6;
         planet_fb     = {'4'};
         rfb_min       = 200;
@@ -35,7 +35,7 @@ switch(example)
         init_file     = [];
         output_file   = [problem_name,'.txt'];
         plot          = 0;
-        useParallel   = 'yes';
+        useParallel   = 'no';
         options       = [];
         maxGen        = 200;
         popsize       = 50;
@@ -45,7 +45,7 @@ switch(example)
         problem_name  = example;
         problem_type  = 'flyby';
         planet_dep    = 'Earth';
-        planet_arr    = 'Jupiter';
+        planet_arr    = '5';
         vinf0_max     =  2;
         planet_fb     = [{'4'},{'3'},{'2'},{'4'},{'3'},{'2'}];
         rfb_min       = 200;
