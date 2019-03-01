@@ -29,6 +29,20 @@ psifb   = setup.psifb;
 ToF                   = setup.ToF + x(2);
 [rf, thetaf,vf, psif] = oe2polar(setup.oe, ToF);
 %
+% Plot Arrival Planet
+%
+theta_init = linspace(0,2*pi,1000);
+%
+r = setup.oe.SMA*(1-setup.oe.ECC^2)./(1+setup.oe.ECC*cos(-setup.oe.LNODE - setup.oe.ARGP + theta_init));
+%
+[xx,yy] = pol2cart(theta_init,r);
+plot(xx,yy,'black -.')
+hold on
+grid on 
+axis equal
+%
+
+%
 % Ensure thetaf > theta0
 %
 while( thetaf < theta0 )

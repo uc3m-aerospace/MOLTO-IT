@@ -114,10 +114,6 @@ if setup.type >0
     %
     eei = ee2;
     %
-    if setup.type == 1
-        eei = (2*a(end)-setup.rf*(1+a(end)*setup.vf^2))*r(end)/(2*a(end)*(r(end)-setup.rf));
-    end
-    %
     K1i = (2*a(end)*eei-r(end))/(r(end)*a(end));
     K2i = sqrt( 1 + 2*e(end)*cos(vk(end)) + e(end)^2);
     %

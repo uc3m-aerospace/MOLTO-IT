@@ -57,22 +57,22 @@ end
 %
 coast_arc()
 %
-t2 = 0;
-%
 if numel(x)>5
     %
-    if setup.type == 1
-        ee2 = (2*a(end)-rf*(1+a(end)*vf^2))*r(end)/(2*a(end)*(r(end)-rf));   
-    end
+   % if setup.type == 1
+   %     ee2 = (2*a(end)-rf*(1+a(end)*vf^2))*r(end)/(2*a(end)*(r(end)-rf));   
+   % end
     %
     [t2, v, r, ~, psi ] = propagate_spirals_try_mex( v,r, thetaB, psi, thetaf, ee2);
+    tk = tk + t2;
     %
-end%
+end
+%
 %------------------------------------------------------------------
 % COMPUTE CONSTRAINTS
 %------------------------------------------------------------------
 %
-ToF_spiral = t1 + tk + t2;
+ToF_spiral = t1 + tk;
 %
 c(1) = -ToF;
 %
@@ -93,7 +93,7 @@ if setup.type == 1
    %
 end
 %
-if ~isreal(ToF_spiral) || isnan(ToF_spiral) || isequal(t1,-1) || isequal(t2,-1)
+if ~isreal(ToF_spiral) || isnan(ToF_spiral)
 %
 ceq = NaN *ones(size(ceq));
 %

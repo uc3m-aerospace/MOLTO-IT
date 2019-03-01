@@ -1,4 +1,4 @@
-function[DV,vf,psif, DVp] = get_DV(setup)
+function[DV,vf,psif] = get_DV(setup)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TARGET RADIUS AND TIME
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -33,11 +33,6 @@ angle   = linspace(theta0,thetaA,100);
 %
 [ r_all , v_all , ~ , a , e , w , ~ , psi_all ,DV1, ~] = propagate_spirals_DV( K1i, K2i, eei, regime0, r0, theta0, t0, angle);
 %
-T_available = thrust_model(r_all);
-T_available = T_available/ac * 1./(v_all.*cos(psi_all)).*r_all./tan(psi_all);
-DV_available = sum(abs(T_available(1:end-1)).*abs(angle(2:end)-angle(1:end-1)));
-DVp = DV1-DV_available;
-%
 %------------------------------------------------------------------
 % COAST ARC / KEPLERIAN ORBIT
 %------------------------------------------------------------------
@@ -54,9 +49,9 @@ psi  = atan2 (1 + e(end) * cos( vk ), e(end) * sin( vk )) ;
 %
 eei = ee2;
     %
-    if setup.type == 1
-        eei = (2*a(end)-setup.rf*(1+a(end)*setup.vf^2))*r(end)/(2*a(end)*(r(end)-setup.rf));   
-    end
+  %  if setup.type == 1
+ %       eei = (2*a(end)-setup.rf*(1+a(end)*setup.vf^2))*r(end)/(2*a(end)*(r(end)-setup.rf));   
+ %   end
     %
 K1i = (2*a(end)*eei-r)/(r*a(end));
 K2i = sqrt( 1 + 2*e(end)*cos(vk) + e(end)^2);

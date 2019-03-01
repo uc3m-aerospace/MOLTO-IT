@@ -8,13 +8,17 @@ mu  = 132712440018e09;
 tc  = sqrt(lc^3/mu);
 vc  = lc/tc;
 %
-%id      = cspice_bodn2c(fb_b);
-
 id      = str2double(fb_b);
-id      = id*100+99;
+%
+if isnan(id)
+    id      = cspice_bodn2c(fb_b);
+else
+    id  = id*100+99;
+end
+%
 R_flyby = mean( cspice_bodvcd(id,'RADII',3) )*1e3/lc;
 mum     = cspice_bodvcd(id,'GM',3)*1e9/mu_cb;
-hpmin   = 200*1e3/lc; 
+hpmin   = 0*1e3/lc;
 %--------------------------------------------------------------------------
 % project velocity onto the orbitalframe
 %--------------------------------------------------------------------------
@@ -28,7 +32,6 @@ voo_planet   =  vfb*sin(psifb);
 v_inf_rr1    =  vrr1-vrr_planet;
 v_inf_oo1    =  voo1-voo_planet;
 v_inf        =  sqrt ( v_inf_rr1^2+v_inf_oo1^2 );
-%v_inf*vc/1e3
 %
 angle_v_inf1 =  atan2(v_inf_oo1,v_inf_rr1); 
 %

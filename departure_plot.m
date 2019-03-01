@@ -27,6 +27,7 @@ theta_init = linspace(0,2*pi,1000);
 r = setup.oe0.SMA*(1-setup.oe0.ECC^2)./(1+setup.oe0.ECC*cos(-setup.oe0.LNODE - setup.oe0.ARGP + theta_init));
 %
 [xx,yy] = pol2cart(theta_init,r);
+figure
 plot(xx,yy,'black -.')
 hold on
 grid on 

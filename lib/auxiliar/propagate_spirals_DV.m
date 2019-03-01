@@ -171,17 +171,12 @@ if (abs(theta(end)-theta(1)) < 1e-11)
 else
     %
     at         = 1 ./ r.^2 .* sqrt( ee^2 * cos(psi).^2 + ( 1 - 2 * ee )^2 * sin(psi).^2 );
-    %integran   = @(thetai,theta,at,v,psi,r) interp1(theta,at.*1./(v.*cos(psi)).*r./tan(psi),thetai,'linear','extrap');
-    integrand  = at.*1./(v.*cos(psi)).*r./tan(psi);
-    %DV1        = 0.5*(abs(integrand(2:end)-integrand(1:end-1))).*abs(theta(2:end)-theta(1:end-1));
-    
-    DV = sum(abs(integrand(1:end-1)).*abs(theta(2:end)-theta(1:end-1)));
-    %DV         = integral(@(thetai)integran(thetai,theta,at,v,psi,r),theta(1),theta(end));
+    integrand  = at.*1./(v.*cos(psi)).*r./tan(psi);    
+    DV         = sum(integrand(1:end-1).*abs(theta(2:end)-theta(1:end-1)));
+    if DV == 0
+        DV = NaN;
+    end
     %
-    %if DV == 0
-    %    flag = -1;
-        
-    %end
 end
 
 t         = NaN;
