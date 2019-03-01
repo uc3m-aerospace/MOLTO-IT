@@ -23,6 +23,8 @@ Installation requires simply that you download [MOLTO-IT](https://github.com/uc3
 A recent version of Matlab is needed to run the code (R2016a or newer). The [Matlab Optimization Toolbox](https://es.mathworks.com/help/optim/index.html) is required to use most of the functionality.
 
 Additionally, the Matlab interface of the [Spice Toolkit](https://naif.jpl.nasa.gov/naif/toolkit.html) has to be installed to allow for ephemerides calculations.
+Include the downloaded folders and subfolders in MOLTO-IT/spice. 
+Additionally, appropriate ephemerides .bsp kernels from [here](https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/) have to be download and included in MOLTO-IT/spice/kernels 
 
 ## Quick Usage Guide
 
