@@ -24,6 +24,13 @@ lc  = 149597870.700e03;
 mu  = 132712440018e09;
 tc  = sqrt(lc^3/mu);
 vc  = lc/tc;
+ac  = vc/tc;
+%
+data.lc = lc;
+data.mu = mu;
+data.tc = tc;
+data.vc = vc;
+data.ac = ac;
 %
 %%-------------------------------------------------------------------------
 % DECODE INPUT VECTOR
@@ -75,7 +82,7 @@ et0               = et0_min + (et0_max - et0_min)*et0_factor;
 data.initial_date = et0_min;
 data.final_date   = et0_max;
 data.xind         = x(ind.t0);
-data.vinf0        = setup.vinf0;
+data.vinf0        = setup.vinf0*1e3/vc;
 data.plot         = setup.plot;
 transfer_type     = setup.type;
 %
