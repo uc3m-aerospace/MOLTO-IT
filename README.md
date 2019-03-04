@@ -60,7 +60,7 @@ In order to optimize a mission, the user needs to call the main function *molto_
 ```
 **NOTE**: Ensure that all the folders and subfolders are in the matlab path.
 
-The following window should pop-up, and the evolution process os the Pareto front can be visulized.
+The following window should pop-up, and the evolution process of the Pareto front can be visulized.
 
 ![Pop-up window](display.png)
 
