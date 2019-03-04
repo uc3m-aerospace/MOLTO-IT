@@ -165,7 +165,7 @@ options.numCons = 1;      % number of constraints
 options.lb      = LB;     % lower bound of x
 options.ub      = UB;     % upper bound of x
 %
-options.nameObj    = {'Time ( years )','m_p','flybys'};  % List of objectives names for the plot
+options.nameObj    = {'Time ( years )','m_p/m_0','flybys'};  % List of objectives names for the plot
 options.crossover  = {'intermediate', 0.5};     % crossover operator (Ratio=1.2)--Intermediate crossover [3] creates two children from two parents: parent1 and parent2.If it lies in the range [0, 1], the children created are within the two parent. If algorithm is premature, try to set ratio larger than 1.0.
 options.mutation   = {'gaussian',0.1, 0.2};     % mutation operator (scale=0.1(deviation of the random number), shrink=0.5)--> for example, shrink?[0.5, 1.0]) is usually used for local search. A large mutation range (shrink == 0) is require getting out of the local Pareto-optimal fronts
 options.crossoverFraction = 0.8;                % crossover fraction of variables of an individual ( 2/numVar )-->only crossoverFraction of all variables would do crossover

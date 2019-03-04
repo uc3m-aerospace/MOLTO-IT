@@ -14,32 +14,17 @@ addpath(mice_lib);
 %
 try
     % Leap seconds information and computation of the ephemeris time from UTC
-    cspice_furnsh([kernels,'naif0010.tls'])  
-    % Rotational elements for reference frames                                                                  
-    cspice_furnsh([kernels,'pck00010.tpc'])  
-    % Ephemerides of planets, Moon and Sun
-    cspice_furnsh([kernels,'de421.bsp'])
-    % Ephemerides of planets, Moon and Sun
-    cspice_furnsh([kernels,'de430.bsp'])
-    % Ephemerides of Jupiter
-    cspice_furnsh([kernels,'jup230.bsp'])
-    % Ephemerides of planets, Moon and Sun
-    cspice_furnsh([kernels,'de432.bsp'])
+    cspice_furnsh([kernels,'naif0010.tls'])
+    % Rotational elements for reference frames
+    % Ephmerides for Ceres
+    cspice_furnsh([kernels,'2000001.bsp'])
     % Ephemerides of planets, Moon and Sun
     cspice_furnsh([kernels,'de432s.bsp'])
     % Gravitational constants of the planets
     cspice_furnsh([kernels,'gm_de431.tpc'])
-    % Ephemerides of Ceres
-    cspice_furnsh([kernels,'2000001.bsp'])
-    %Ephemerides of Pluto
-    cspice_furnsh([kernels,'2000999.bsp'])
-    %Ephemerides of Comet 67P/Churyumov-Gerasimenko
-    cspice_furnsh([kernels,'1000012.bsp'])
-    %Ephemerides of Asteroid Didimos
-    cspice_furnsh([kernels,'2065803.bsp'])
-    %Ephemerides of Asteroid Ryugu
-    cspice_furnsh([kernels,'2162173.bsp'])
-    % If all has been loaded fine, do nothing
+    % Rotational elements for reference frames
+    cspice_furnsh([kernels,'pck00010.tpc'])
+    %
     ME = 'No error';
     %
 catch ME % ME is an identifier containing the error message
