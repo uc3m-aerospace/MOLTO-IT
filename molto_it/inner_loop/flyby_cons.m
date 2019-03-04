@@ -67,13 +67,13 @@ end
 % FIRST SPIRAL ARC
 %------------------------------------------------------------------
 %
-[t1, v, r, theta, psi ] = propagate_spirals_mex(v0,r0,theta0,psi0,thetaA,ee1) ;
+[t1, v, r, theta, psi ] = propagate_spirals(v0,r0,theta0,psi0,thetaA,ee1) ;
 %
 coast_arc()
 %
 if numel(x)>5
     %
-    [t2, v, r, ~, psi ] = propagate_spirals_mex( v,r, thetaB, psi, thetaf, ee2);
+    [t2, v, r, ~, psi ] = propagate_spirals( v,r, thetaB, psi, thetaf, ee2);
     tk = tk + t2;
     %
 end

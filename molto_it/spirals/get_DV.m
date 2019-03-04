@@ -3,12 +3,6 @@ function[DV,vf,psif] = get_DV(setup)
 % TARGET RADIUS AND TIME
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-lc  = 149597870.700e03;
-mu  = 132712440018e09;
-tc  = sqrt(lc^3/mu);
-vc  = lc/tc;
-ac  = vc/tc;
-%
 ee1    = setup.ee1;
 ee2    = setup.ee2;
 theta0 = setup.theta0;

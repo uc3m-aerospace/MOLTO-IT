@@ -35,7 +35,7 @@ switch(example)
         init_file     = [];
         output_file   = [problem_name,'.txt'];
         plot          = 0;
-        useParallel   = 'no';
+        useParallel   = 'yes';
         options       = [];
         maxGen        = 200;
         popsize       = 50;
@@ -66,7 +66,6 @@ end
 %
 % PREPARE AND SAVE INPUT STRUCTURE
 %
-save(example);
 input = load(example);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
