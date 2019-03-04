@@ -54,6 +54,7 @@ In order to optimize a mission, the user needs to call the main function *molto_
         input.useParallel   = 'yes';   % yes/no for parallel execution of the genetic algorithm
         input.maxGen        = 200;     % maximum number of generations
         input.popsize       = 200;     % Population Size
+        input.spice_dir     =  '/home/MOLTO-IT/spice' % The spice directory folder
         
 % RUN MOLTO-IT ALGORITHM
         molto_it(input)
