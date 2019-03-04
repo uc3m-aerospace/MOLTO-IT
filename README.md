@@ -41,7 +41,7 @@ In order to optimize a mission, the user needs to call the main function *molto_
         input.planet_dep    = '3';     % Departure planet using space nomenclature (e.g. 3==Earth)
         input.planet_arr    = '5';     % Arrival planet using space nomenclature (e.g. 5==Jupiter)
         input.vinf0_max     =  2;      % Hyperbolic excess velocity at departure planet (km/s)
-        input.planet_fb     = [{'4'},{'3'},{'2'}]; List of available planets to flyby in spice nomenclature
+        input.planet_fb     = [{'4'},{'3'},{'2'}]; % List of available planets to flyby in spice nomenclature
         input.rfb_min       = 200;     % minimum flyby altitude (km)
         input.n_fb          = [0,3];   % minimum/maximum number of possible flybys
         input.rev           = [0,0];   % minimum/maximum number of possible revolutions
