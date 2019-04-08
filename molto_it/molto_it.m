@@ -42,6 +42,11 @@ ind.t0     = ind.fbb(2) + 1;
 ind.ToF(1) = ind.t0 + 1;
 ind.ToF(2) = ind.ToF(1) + n_fb_max;
 %
+% Determine the position of the revolution number in the gen     
+%
+ind.rev(1) = ind.ToF(2) + 1;
+ind.rev(2) = ind.rev(1) + n_fb_max;
+%
 %code_planets
 %
 input.ind        = ind;

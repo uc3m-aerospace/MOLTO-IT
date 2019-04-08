@@ -29,12 +29,11 @@ aux.planet2  = planet2;
 aux.et0      = et0;
 aux.ToF      = ToF/(tc)*(3600*24);
 aux.type     = type;
-aux.n        = 0;
 %--------------------------------------------------------------------------
 % Orbital Elements for Departure planet
 %--------------------------------------------------------------------------
-S        = cspice_spkezr(planet1, et0, 'ECLIPJ2000', 'NONE', '0');
-O        = cspice_oscelt(S, et0, mu/1e9 );
+S         = cspice_spkezr(planet1, et0, 'ECLIPJ2000', 'NONE', '0');
+O         = cspice_oscelt(S, et0, mu/1e9 );
 %
 oe0.ECC   = O(2);
 oe0.INC   = O(3);
@@ -42,19 +41,19 @@ oe0.LNODE = O(4);
 oe0.ARGP  = O(5);
 oe0.SMA   = O(1)/(1-oe0.ECC)*1e3/lc;
 oe0.M0    = O(6);
-aux.oe0 = oe0;
+aux.oe0   = oe0;
 %--------------------------------------------------------------------------
 % Orbital Elements for Arrival planet
 %--------------------------------------------------------------------------
-S        = cspice_spkezr(planet2, et0, 'ECLIPJ2000', 'NONE', '0');
-O        = cspice_oscelt(S, et0, mu/1e9 );
+S         = cspice_spkezr(planet2, et0, 'ECLIPJ2000', 'NONE', '0');
+O         = cspice_oscelt(S, et0, mu/1e9 );
 %
-oe.ECC   = O(2);
-oe.INC   = O(3);
-oe.LNODE = O(4);
-oe.ARGP  = O(5);
-oe.SMA   = O(1)/(1-oe.ECC)*1e3/lc;
-oe.M0    = O(6);
+oe.ECC    = O(2);
+oe.INC    = O(3);
+oe.LNODE  = O(4);
+oe.ARGP   = O(5);
+oe.SMA    = O(1)/(1-oe.ECC)*1e3/lc;
+oe.M0     = O(6);
 aux.oe = oe;
 %
 tlb =  - 200/(tc)*(3600*24);

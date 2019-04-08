@@ -1,19 +1,19 @@
 function [Obj,Cons] = fitness_nsga2(x,setup,~)
 %--------------------------------------------------------------------------
-%	MOLTO-IT Software Computation Core										
-%																			
-%	This program is developed at the Universidad Carlos III de Madrid,		
-%   as part of a PhD program.										
-%																			
-%   The software and its components are developed by David Morante González															
-%																		
+%	MOLTO-IT Software Computation Core
+%
+%	This program is developed at the Universidad Carlos III de Madrid,
+%   as part of a PhD program.
+%
+%   The software and its components are developed by David Morante González
+%
 %   The program is released under the MIT License
 %
-%   Copyright (c) 2019 David Morante González															
-%																			
+%   Copyright (c) 2019 David Morante González
+%
 %--------------------------------------------------------------------------
 %
-%   Function that computes the Flight time and opropellant mass fraction 
+%   Function that computes the Flight time and opropellant mass fraction
 %   given an input gen x
 %
 %%-------------------------------------------------------------------------
@@ -42,7 +42,7 @@ ind  = setup.ind;
 % GET FLYBY SEQUENCE
 %%-------------------------------------------------------------------------
 %
-fbb          = x(ind.fbb(1) : ind.fbb(2)); 
+fbb          = x(ind.fbb(1) : ind.fbb(2));
 planets      = setup.planets;
 n_fb         = length(fbb);
 planet_dep   = setup.planet_dep ;
@@ -66,10 +66,11 @@ end
 planet_seq = [planet_dep,planet_flyby,planet_arr];
 %
 %%--------------------------------------------------------------------------
-% GET TIME OF FLIGHTS
+% GET TIME OF FLIGHTS and Revolutions Number
 %%--------------------------------------------------------------------------
 %
 ToFg = x(ind.ToF(1):ind.ToF(2));
+rev  = x(ind.rev(1):ind.rev(2));
 %
 %%--------------------------------------------------------------------------
 % GET INITIAL TIME
@@ -120,11 +121,13 @@ t     = 0;
 flagT = n_fb+1;
 %
 for i = 1 : n_fb + 1
-        %
-        %%--------------------------------------------------------------------------
-        % Null Flyby
-        %%--------------------------------------------------------------------------
-        %
+    %
+    data.n = rev(i);
+    
+    %%--------------------------------------------------------------------------
+    % Null Flyby
+    %%--------------------------------------------------------------------------
+    %
     if strcmp(planet_seq(i+1),'Null')
         %
         planet_seq(i+1) = planet_seq(i);
@@ -132,7 +135,7 @@ for i = 1 : n_fb + 1
         r(i+1)     = r(i);
         v(i+1)     = v(i);
         theta(i+1) = theta(i);
-        psi(i+1)   = psi(i); 
+        psi(i+1)   = psi(i);
         ToF(i+1)     = 0;
         flagT      = flagT -1;
         %
@@ -172,7 +175,7 @@ for i = 1 : n_fb + 1
         %
         % Update initial values for the following leg
         %
-        ToF(i+1)        = out.ToF; 
+        ToF(i+1)        = out.ToF;
         data.vfb        = out.vp;
         data.psifb      = out.psip;
         data.theta0     = out.thetasp;
@@ -209,9 +212,9 @@ else
     %
     % Unfeasible Trajectory
     %
-    DV_total = 1;   
+    DV_total = 1;
     Time = 10;
-    %  
+    %
 end
 %
 %--------------------------------------------------------------------------
