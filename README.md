@@ -1,5 +1,5 @@
 # MOLTO-IT
-[![DOI](https://zenodo.org/badge/169291732.svg)](https://zenodo.org/badge/latestdoi/169291732)
+[![DOI](https://zenodo.org/badge/169291732.svg)](https://zenodo.org/badge/latestdoi/169291732) 
 
 **MOLTO-IT** (Multi-Objective Low-Thrust Optimizer for Interplanetary Trajectories) is a fully automated Matlab tool for the preliminary design of low-thrust, multi-gravity assist trajectories. The software combines an outer loop that provides multi-objective optimization via a genetic algorithm (NSGA-II) with an inner loop that supplies gradient-based optimization (fmincon) of a shape-based low-thrust trajectory parameterization. It includes simplifications such as coplanar bodies and no enforced propulsion constraints along with the shape-based parameterization of the low-thrust arc.
 
