@@ -5,11 +5,11 @@ function [Obj, Cons] = fitness_nsga2(x, setup, ~)
 %	This program is developed at the Universidad Carlos III de Madrid,
 %   as part of a PhD program.
 %
-%   The software and its components are developed by David Morante Gonz�lez
+%   The software and its components are developed by David Morante González
 %
 %   The program is released under the MIT License
 %
-%   Copyright (c) 2019 David Morante Gonz�lez
+%   Copyright (c) 2019 David Morante González
 %
 %--------------------------------------------------------------------------
 %
