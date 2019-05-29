@@ -8,20 +8,20 @@ function [pop, state] = evaluate(opt, pop, state, varargin)
 %*************************************************************************
 
 N = length(pop);
-allTime = zeros(N, 1);  % allTime : use to calculate average evaluation times
+allTime = zeros(N, 1); % allTime : use to calculate average evaluation times
 
 %*************************************************************************
 % Evaluate objective function in parallel
 %*************************************************************************
-if( strcmpi(opt.useParallel, 'yes') == 1 )
+if (strcmpi(opt.useParallel, 'yes') == 1)
     parfor i = 1:N
         fprintf('\nEvaluating the objective function... Generation: %d / %d , Individual: %d / %d \n', state.currentGen, opt.maxGen, i, N);
         [pop(i), allTime(i)] = evalIndividual(pop(i), opt.objfun, varargin{:});
     end
 
-%*************************************************************************
-% Evaluate objective function in serial
-%*************************************************************************
+    %*************************************************************************
+    % Evaluate objective function in serial
+    %*************************************************************************
 else
     for i = 1:N
         fprintf('\nEvaluating the objective function... Generation: %d / %d , Individual: %d / %d \n', state.currentGen, opt.maxGen, i, N);
@@ -32,10 +32,8 @@ end
 %*************************************************************************
 % Statistics
 %*************************************************************************
-state.avgEvalTime   = sum(allTime) / length(allTime);
+state.avgEvalTime = sum(allTime) / length(allTime);
 state.evaluateCount = state.evaluateCount + length(pop);
-
-
 
 
 function [indi, evalTime] = evalIndividual(indi, objfun, varargin)
@@ -47,23 +45,20 @@ function [indi, evalTime] = evalIndividual(indi, objfun, varargin)
 %*************************************************************************
 
 tStart = tic;
-[y, cons] = objfun( indi.var, varargin{:} );
+[y, cons] = objfun(indi.var, varargin{:});
 evalTime = toc(tStart);
 
 
 % Save the objective values and constraint violations
 indi.obj = y;
-if( ~isempty(indi.cons) )
-    idx = find( cons );
-    if( ~isempty(idx) )
+if (~isempty(indi.cons))
+    idx = find(cons);
+    if (~isempty(idx))
         indi.nViol = length(idx);
-        indi.violSum = sum( abs(cons) );
+        indi.violSum = sum(abs(cons));
     else
         indi.nViol = 0;
         indi.violSum = 0;
     end
 end
 indi.cons = cons;
-
-
-

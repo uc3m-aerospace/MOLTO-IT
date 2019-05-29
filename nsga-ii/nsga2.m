@@ -35,41 +35,41 @@ opt = verifyOpt(opt);
 %*************************************************************************
 % variables initialization
 %*************************************************************************
-nVar    = opt.numVar;
-nObj    = opt.numObj;
-nCons   = opt.numCons;
+nVar = opt.numVar;
+nObj = opt.numObj;
+nCons = opt.numCons;
 popsize = opt.popsize;
 
 % pop : current population
 % newpop : new population created by genetic algorithm operators
 % combinepop = pop + newpop;
-pop = repmat( struct(...
-    'var', zeros(1,nVar), ...
-    'obj', zeros(1,nObj), ...
-    'cons', zeros(1,nCons),...
-    'rank', 0,...
-    'distance', 0,...
-    'prefDistance', 0,...       % preference distance used in R-NSGA-II
-    'nViol', 0,...
-    'violSum', 0),...
-    [1,popsize]);
+pop = repmat(struct( ...
+    'var', zeros(1, nVar), ...
+    'obj', zeros(1, nObj), ...
+    'cons', zeros(1, nCons), ...
+    'rank', 0, ...
+    'distance', 0, ...
+    'prefDistance', 0, ... % preference distance used in R-NSGA-II
+    'nViol', 0, ...
+    'violSum', 0), ...
+    [1, popsize]);
 
 % state: optimization state of one generation
-state = struct(...
-'currentGen', 1,...         % current generation number
-'evaluateCount', 0,...      % number of objective function evaluation
-'totalTime', 0,...          % total time from the beginning
-'firstFrontCount', 0,...    % individual number of first front
-'frontCount', 0,...         % number of front
-'avgEvalTime', 0 ...        % average evaluation time of objective function (current generation)
-);
+state = struct( ...
+    'currentGen', 1, ... % current generation number
+    'evaluateCount', 0, ... % number of objective function evaluation
+    'totalTime', 0, ... % total time from the beginning
+    'firstFrontCount', 0, ... % individual number of first front
+    'frontCount', 0, ... % number of front
+    'avgEvalTime', 0 ... % average evaluation time of objective function (current generation)
+    );
 
-result.pops     = repmat(pop, [opt.maxGen, 1]);     % each row is the population of one generation
-result.states   = repmat(state, [opt.maxGen, 1]);   % each row is the optimizaiton state of one generation
-result.opt      = opt;                              % use for output
+result.pops = repmat(pop, [opt.maxGen, 1]); % each row is the population of one generation
+result.states = repmat(state, [opt.maxGen, 1]); % each row is the optimizaiton state of one generation
+result.opt = opt; % use for output
 
 % global variables
-global STOP_NSGA;   %STOP_NSGA : used in GUI , if STOP_NSGA~=0, then stop the optimizaiton
+global STOP_NSGA; %STOP_NSGA : used in GUI , if STOP_NSGA~=0, then stop the optimizaiton
 STOP_NSGA = 0;
 
 
@@ -87,7 +87,7 @@ state.totalTime = toc(tStart);
 state = statpop(pop, state);
 
 result.pops(1, :) = pop;
-result.states(1)  = state;
+result.states(1) = state;
 
 % output
 plotnsga(result, ngen);
@@ -97,14 +97,14 @@ opt = callOutputfuns(opt, state, pop);
 %*************************************************************************
 % NSGA2 iteration
 %*************************************************************************
-while( ngen < opt.maxGen && STOP_NSGA==0)
+while (ngen < opt.maxGen && STOP_NSGA == 0)
     % 0. Display some information
-	ngen = ngen+1;
+    ngen = ngen + 1;
     state.currentGen = ngen;
     fprintf('\n\n************************************************************\n');
     fprintf('*      Current generation %d / %d\n', ngen, opt.maxGen);
     fprintf('************************************************************\n');
-    
+
     % 1. Create new population
     newpop = selectOp(opt, pop);
     newpop = crossoverOp(opt, newpop, state);
@@ -113,38 +113,36 @@ while( ngen < opt.maxGen && STOP_NSGA==0)
 
     % 2. Combine the new population and old population : combinepop = pop + newpop
     combinepop = [pop, newpop];
-    
+
     % 3. Fast non dominated sort
     [opt, combinepop] = ndsort(opt, combinepop);
-    
+
     % 4. Extract the next population
     pop = extractPop(opt, combinepop);
 
     % 5. Save current generation results
     state.totalTime = toc(tStart);
     state = statpop(pop, state);
-    
+
     result.pops(ngen, :) = pop;
-    result.states(ngen)  = state;
+    result.states(ngen) = state;
 
     % 6. plot current population and output
-    if( mod(ngen, opt.plotInterval)==0 )
+    if (mod(ngen, opt.plotInterval) == 0)
         plotnsga(result, ngen);
     end
-    if( mod(ngen, opt.outputInterval)==0 )
+    if (mod(ngen, opt.outputInterval) == 0)
         opt = callOutputfuns(opt, state, pop);
     end
-    
+
 end
 
 % call output function for closing file
 opt = callOutputfuns(opt, state, pop, -1);
 
 % close worker processes
-if( strcmpi(opt.useParallel, 'yes'))
+if (strcmpi(opt.useParallel, 'yes'))
     %delete(gcp)
 end
 
 toc(tStart);
-
-

@@ -12,7 +12,4 @@ rankVec = vertcat(pop.rank);
 rankVec = sort(rankVec);
 
 state.frontCount = rankVec(N);
-state.firstFrontCount = length( find(rankVec==1) );
-
-
-
+state.firstFrontCount = length(find(rankVec == 1));

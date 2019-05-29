@@ -25,8 +25,8 @@ end
 nVar = opt.numVar;
 
 % "auto" mutation fraction
-if( ischar(opt.mutationFraction) )
-    if( strcmpi(opt.mutationFraction, 'auto') )
+if (ischar(opt.mutationFraction))
+    if (strcmpi(opt.mutationFraction, 'auto'))
         fraction = 2.0 / nVar;
     else
         error('NSGA2:MutationOpError', 'The "mutationsFraction" parameter should be scalar or "auto" string.');
@@ -39,32 +39,31 @@ end
 % All of the individual would be modified, but only 'mutationFraction' of design
 % variables for an individual would be changed.
 for ind = 1:length(pop)
-        child = fun( pop(ind), opt, state, fraction, mutationopt);
-        
-        % Rounding for integer variables
-        for v = 1:nVar
-            if( opt.vartype(v) == 2)
-                child.var(v) = round( child.var(v) );
-            end
-        end
+    child = fun(pop(ind), opt, state, fraction, mutationopt);
 
-        child.var = varlimit(child.var, opt.lb, opt.ub);
-        
-        pop(ind) = child;
+    % Rounding for integer variables
+    for v = 1:nVar
+        if (opt.vartype(v) == 2)
+            child.var(v) = round(child.var(v));
+        end
+    end
+
+    child.var = varlimit(child.var, opt.lb, opt.ub);
+
+    pop(ind) = child;
 end
 
 
-
-function child = mutationGaussian( parent, opt, state, fraction, options)
+function child = mutationGaussian(parent, opt, state, fraction, options)
 % Function: child = mutationGaussian( parent, opt, state, fraction, options)
 % Description: Gaussian mutation operator. Reference Matlab's help :
 %   Genetic Algorithm Options :: Options Reference (Global Optimization Toolbox)
-% Parameters: 
+% Parameters:
 %   fraction : mutation fraction of variables of an individual
 %   options{1} : scale. This paramter should be large enough for interger variables
 %     to change from one to another.
 %   options{2} : shrink
-% Return: 
+% Return:
 %
 %         LSSSSWC, NWPU
 %    Revision: 1.1  Data: 2011-07-13
@@ -74,7 +73,7 @@ function child = mutationGaussian( parent, opt, state, fraction, options)
 %*************************************************************************
 % 1. Verify the parameters.
 %*************************************************************************
-if( length(options)~=2)
+if (length(options) ~= 2)
     error('NSGA2:MutationOpError', 'Mutation operator parameter error!');
 end
 
@@ -97,12 +96,7 @@ scale = scale * (ub - lb);
 child = parent;
 numVar = length(child.var);
 for i = 1:numVar
-    if(rand() < fraction)
+    if (rand() < fraction)
         child.var(i) = parent.var(i) + scale(i) * randn();
     end
 end
-
-
-
-
-
