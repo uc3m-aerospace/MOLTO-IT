@@ -29,6 +29,8 @@ switch(example)
         input.planet_fb     = {'4'};
         input.rfb_min       = 200;
         input.Isp           = 3000; % seconds
+        input.thrust        = 100; % mN
+        input.nthrusters    = 1;   % mumber of thrusters
         input.mass          = 1000; % kg
         input.power         = 5000; % W
         input.n_fb          = [0,1];
@@ -57,6 +59,8 @@ switch(example)
         input.ToF           = [50  50  50  50;
             500 500 500 1000];
         input.Isp           = 3000; % seconds
+        input.thrust        = 100; % mN
+        input.nthrusters    = 1;   % mumber of thrusters
         input.mass          = 1000; % kg
         input.power         = 5000; % W
         input.Initial_Date  = [{'2029 Jan 01 00:00:00'},{'2030 Dec 31 00:00:00'}];
@@ -76,6 +80,8 @@ switch(example)
         input.planet_arr    = '9';
         input.vinf0_max     =  8.77;
         input.Isp           = 3000; % seconds
+        input.thrust        = 100; % mN
+        input.nthrusters    = 1;   % mumber of thrusters
         input.mass          = 1000; % kg
         input.power         = 5000; % W
         input.planet_fb     = [{'2'},{'3'},{'4'},{'5'},{'6'},{'7'}];
