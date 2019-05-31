@@ -1,5 +1,5 @@
 # Spice folder
-Download the Matlab interface of the [Spice Toolkit](https://naif.jpl.nasa.gov/naif/toolkit.html) and include it in this directory.
+Download the Matlab interface of the [Spice Toolkit](https://naif.jpl.nasa.gov/naif/toolkit_MATLAB.html) and include it in this directory.
 
 Include your required kernels on the /kernels folder 
 

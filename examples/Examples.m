@@ -4,8 +4,8 @@
 %
 % Name of the Problem to be loaded
 %
-example   = 'Pluto';
-spice_dir = '/Users/davidmorante/Desktop/MicePackage/';
+example   = 'Ceres';
+input.spice_dir = '/Users/davidmorante/Desktop/MicePackage/';
 %
 %planets = [ {'1'}   % mercury
 %            {'2'}   % venus
@@ -28,12 +28,15 @@ switch(example)
         input.vinf0_max     =  1.6;
         input.planet_fb     = {'4'};
         input.rfb_min       = 200;
+        input.Isp           = 3000; % seconds
+        input.mass          = 1000; % kg
+        input.power         = 5000; % W
         input.n_fb          = [0,1];
         input.rev           = [0,0];
         input.ToF           = [100,1000];
         input.Initial_Date  = [{'2003 Jan 01 00:00:00'},{'2003 Dec 31 00:00:00'}];
         input.init_file     = [];
-        input.output_file   = [problem_name,'.txt'];
+        input.output_file   = [example,'.txt'];
         input.plot          = 0;
         input.useParallel   = 'yes';
         input.options       = [];
@@ -53,6 +56,9 @@ switch(example)
         input.rev           = [0,0];
         input.ToF           = [50  50  50  50;
             500 500 500 1000];
+        input.Isp           = 3000; % seconds
+        input.mass          = 1000; % kg
+        input.power         = 5000; % W
         input.Initial_Date  = [{'2029 Jan 01 00:00:00'},{'2030 Dec 31 00:00:00'}];
         input.init_file     = [];
         input.output_file   = [problem_name,'.txt'];
@@ -69,12 +75,15 @@ switch(example)
         input.planet_dep    = 'Earth';
         input.planet_arr    = '9';
         input.vinf0_max     =  8.77;
+        input.Isp           = 3000; % seconds
+        input.mass          = 1000; % kg
+        input.power         = 5000; % W
         input.planet_fb     = [{'2'},{'3'},{'4'},{'5'},{'6'},{'7'}];
         input.planet_fb     = [{'5'}];
         input.rfb_min       = 200;
-        input.n_fb          = [1,4];
+        input.n_fb          = [1,1];
         input.rev           = [0,1];
-        input.ToF           = [0 9125];
+        input.ToF           = [200 9125];
         input.Initial_Date  = [{'2028 Jan 01 00:00:00'},{'2028 Dec 31 00:00:00'}];
         input.init_file     = [];
         input.output_file   = [problem_name,'.txt'];

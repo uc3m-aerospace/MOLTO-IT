@@ -200,7 +200,7 @@ if flag == 0
     % Feasible Trajectory
     %
     DV_main  =  (sum(DV)) *  vc / 1000;
-    DV_total =  1 - exp ( - ( DV_main /3 )  / (9.81) );
+    DV_total =  1 - exp ( - ( DV_main /(setup.Isp/1000) )  / (9.81) );
     Time = ( sum(ToF) )*tc/(3600*24*365) ;
     %
     % Penalty for high DV trajectories
@@ -221,9 +221,9 @@ end
 % COMPUTE OBJECTIVE FUNCTION
 %--------------------------------------------------------------------------
 %
-Obj  = [Time, DV_total, -nfb_r]
+Obj  = [Time, DV_total, -nfb_r];
 %
-Cons = flagT
+Cons = flagT;
 %
 %--------------------------------------------------------------------------
 
