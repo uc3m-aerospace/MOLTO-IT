@@ -6,7 +6,7 @@ function output = molto_it(input)
 %	This program is developed at the Universidad Carlos III de Madrid,		
 %   as part of a PhD program.										
 %																			
-%   The software and its components are developed by David Morante Gonz�lez															
+%   The software and its components are developed by David Morante González															
 %																		
 %   The program is released under the MIT License
 %
