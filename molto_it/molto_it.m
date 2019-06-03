@@ -10,7 +10,7 @@ function output = molto_it(input)
 %																		
 %   The program is released under the MIT License
 %
-%   Copyright (c) 2019 David Morante Gonz�lez															
+%   Copyright (c) 2019 David Morante González															
 %																			
 %--------------------------------------------------------------------------
 %
