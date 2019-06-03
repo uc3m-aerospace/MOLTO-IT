@@ -43,24 +43,24 @@ In order to optimize a mission, the user needs to call the main function *molto_
         input.planet_arr    = '5';      % Arrival planet using space nomenclature (e.g. 5==Jupiter)
         input.vinf0_max     =  2;       % Hyperbolic excess velocity at departure planet (km/s)
         input.planet_fb     = [{'4'},{'3'},{'2'},{'4'},{'3'},{'2'}]; % List of available planets to flyby in spice nomenclature
-        input.rfb_min       = 200;  % Minimum flyby altitude (km)
-        input.n_fb          = [0,3]; % Minimum/Maximum number of possible flybys
-        input.rev           = [0,0]; % Minimum/Maximum number of possible revolutions
+        input.rfb_min       = 200;      % Minimum flyby altitude (km)
+        input.n_fb          = [0,3];    % Minimum/Maximum number of possible flybys
+        input.rev           = [0,0];    % Minimum/Maximum number of possible revolutions
         input.ToF           = [50  50  50  50; % Minimum/Maximum transfer time per leg (days)
             500 500 500 1000];
-        input.Isp           = 3000; % Seconds
-        input.thrust        = 100; % mN
-        input.nthrusters    = 1;   % Number of thrusters
-        input.mass          = 1000; % Kg 
-        input.power         = 5000; % W
-        input.Initial_Date  = [{'2029 Jan 01 00:00:00'},{'2030 Dec 31 00:00:00'}];  % Minimum/Maximum Launch date (Gregorian Date)
-        input.init_file     = [];  % Init population File name (if not provided, random initial population)
+        input.Isp           = 3000;     % Seconds
+        input.thrust        = 100;      % mN
+        input.nthrusters    = 1;        % Number of thrusters
+        input.mass          = 1000;     % Kg 
+        input.power         = 5000;     % W
+        input.Initial_Date  = [{'2029 Jan 01 00:00:00'},{'2030 Dec 31 00:00:00'}]; % Minimum/Maximum Launch date (Gregorian Date)
+        input.init_file     = [];       % Init population File name (if not provided, random initial population)
         input.output_file   = [problem_name,'.txt']; % Solution population File name
-        input.plot          = 0;  % Plotting option (recomended = 0, option =1 is under development)
-        input.useParallel   = 'yes'; % yes/no for parallel execution of the genetic algorithm
-        input.options       = []; % Under development
-        input.maxGen        = 200; % Maximum number of generations
-        input.popsize       = 200; % Population Size
+        input.plot          = 0;        % Plotting option (recomended = 0, option =1 is under development)
+        input.useParallel   = 'yes';    % yes/no for parallel execution of the genetic algorithm
+        input.options       = [];       % Under development
+        input.maxGen        = 200;      % Maximum number of generations
+        input.popsize       = 200;      % Population Size
         
 % RUN MOLTO-IT ALGORITHM
         molto_it(input)
