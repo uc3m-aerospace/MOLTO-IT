@@ -19,6 +19,11 @@ function output = molto_it(input)
 %
 %--------------------------------------------------------------------------
 %
+% Include paths
+%
+addpath(genpath('~/MOLTO-IT'))
+input.spice_dir = '~/MOLTO-IT/spice';
+%
 % Load maximum/minimum number of flybys
 %
 n_fb_min   = input.n_fb(1);
@@ -195,7 +200,10 @@ if strcmp(options.useParallel,'no')
     load_spice_kernels(input.spice_dir);
 else
     %
-    parfor jj  = 1:4
+    %parpool
+    delete(gcp('nocreate'));
+    p= gcp;
+    parfor jj  = 1:p.NumWorkers
         %
         load_spice_kernels(input.spice_dir);
         %

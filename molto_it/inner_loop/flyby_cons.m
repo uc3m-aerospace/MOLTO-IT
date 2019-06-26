@@ -6,11 +6,11 @@ function [c,ceq] = flyby_cons(x,setup)
 %	This program is developed at the Universidad Carlos III de Madrid,
 %   as part of a PhD program.
 %
-%   The software and its components are developed by David Morante González
+%   The software and its components are developed by David Morante Gonzï¿½lez
 %
 %   The program is released under the MIT License
 %
-%   Copyright (c) 2019 David Morante González
+%   Copyright (c) 2019 David Morante Gonzï¿½lez
 %
 %--------------------------------------------------------------------------
 %
@@ -67,13 +67,13 @@ end
 % FIRST SPIRAL ARC
 %------------------------------------------------------------------
 %
-[t1, v, r, theta, psi ] = propagate_spirals(v0,r0,theta0,psi0,thetaA,ee1) ;
+[t1, v, r, theta, psi ] = propagate_spirals_mex(v0,r0,theta0,psi0,thetaA,ee1) ;
 %
 coast_arc()
 %
 if numel(x)>5
     %
-    [t2, v, r, ~, psi ] = propagate_spirals( v,r, thetaB, psi, thetaf, ee2);
+    [t2, v, r, ~, psi ] = propagate_spirals_mex( v,r, thetaB, psi, thetaf, ee2);
     tk = tk + t2;
     %
 end

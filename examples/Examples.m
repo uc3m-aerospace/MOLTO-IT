@@ -5,7 +5,6 @@
 % Name of the Problem to be loaded
 %
 example   = 'Ceres';
-input.spice_dir = '/Users/davidmorante/Desktop/MicePackage/';
 %
 %planets = [ {'1'}   % mercury
 %            {'2'}   % venus
@@ -42,7 +41,7 @@ switch(example)
         input.plot          = 0;
         input.useParallel   = 'yes';
         input.options       = [];
-        input.maxGen        = 200;
+        input.maxGen        = 10;
         input.popsize       = 50;
         
     case'Jupiter'
@@ -65,7 +64,7 @@ switch(example)
         input.power         = 5000; % W
         input.Initial_Date  = [{'2029 Jan 01 00:00:00'},{'2030 Dec 31 00:00:00'}];
         input.init_file     = [];
-        input.output_file   = [problem_name,'.txt'];
+        input.output_file   = [example,'.txt'];
         input.plot          = 0;
         input.useParallel   = 'yes';
         input.options       = [];
@@ -104,7 +103,7 @@ end
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-output       = molto_it(input);
+output = molto_it(input);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
