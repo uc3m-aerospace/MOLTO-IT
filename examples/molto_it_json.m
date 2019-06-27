@@ -18,6 +18,6 @@ function  output = molto_it_json(jsonfile)
 %
 %--------------------------------------------------------------------------
 
-input_ch = textread('example.json', '%s',1);
+input_ch = textread(jsonfile, '%s',1);
 input    = jsondecode(input_ch{1,1});
 output = molto_it(input);
