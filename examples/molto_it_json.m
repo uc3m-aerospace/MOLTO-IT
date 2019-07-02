@@ -18,6 +18,5 @@ function  output = molto_it_json(jsonfile)
 %
 %--------------------------------------------------------------------------
 
-input_ch = textscan(jsonfile, '%s',1);
-input    = jsondecode(input_ch{1,1});
+input  = jsondecode(jsonfile);
 output = molto_it(input);
