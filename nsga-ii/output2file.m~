@@ -103,16 +103,25 @@ fprintf(fid, '\r\n\r\n\r\n');
 % 4. Create File with Pareto front info only
 %*************************************************************************
 
-    fid2 = fopen([opt.outputfile_dir,'/gen',num2str(state.currentGen),'.txt'], 'w');
-    opt.outputfile_paretoFID = fid2;
+if( isfield(opt, 'outputfile_paretoFID') )
+    fid2 = opt.outputfile_paretoFID;
+else
+    fid2 = [];
+end
+
+if( isempty(fid2) )
+    fid2 = fopen([opt.outputfile_dir,'/gen',num2strt()], 'w');
+    if( fid == 0)
+        error('NSGA2:OutputFileError', 'Can not open output file!! file name:%s', opt.outputfile);
+    end
+    opt.outputfileFID = fid2;
     
     for p = 1 : opt.popsize
         for i = 1:opt.numObj
-            fprintf(fid2, '%.10g\t', pop(p).obj(i) );
+            fprintf(fid2, '%g\t', pop(p).obj(i) );
         end
         fprintf(fid2, '\r\n');
     end
-    fclose(fid2);
     
 end
 

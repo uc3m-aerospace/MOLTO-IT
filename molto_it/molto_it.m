@@ -1,20 +1,20 @@
 %--------------------------------------------------------------------------0
 function output = molto_it(input)
 %--------------------------------------------------------------------------
-%	MOLTO-IT Software Computation Core										
-%																			
-%	This program is developed at the Universidad Carlos III de Madrid,		
-%   as part of a PhD program.										
-%																			
-%   The software and its components are developed by David Morante González															
-%																		
+%	MOLTO-IT Software Computation Core
+%
+%	This program is developed at the Universidad Carlos III de Madrid,
+%   as part of a PhD program.
+%
+%   The software and its components are developed by David Morante González
+%
 %   The program is released under the MIT License
 %
-%   Copyright (c) 2019 David Morante González															
-%																			
+%   Copyright (c) 2019 David Morante González
+%
 %--------------------------------------------------------------------------
 %
-%    Function that defined the parameters for NSGA-II and call the 
+%    Function that defined the parameters for NSGA-II and call the
 %    required routines to solve the interplanetary transfer
 %
 %--------------------------------------------------------------------------
@@ -33,21 +33,21 @@ n_fb_max   = input.n_fb(2);
 %
 planet_fb  = input.planet_fb;
 %
-% Determine the position of the flyby planets in the gen      
+% Determine the position of the flyby planets in the gen
 %
 ind.fbb(1) = 1;
 ind.fbb(2) = ind.fbb(1)-1 + n_fb_max;
 %
-% Determine the position of the departure date in the gen      
+% Determine the position of the departure date in the gen
 %
 ind.t0     = ind.fbb(2) + 1;
 %
-% Determine the position of the flyby times in the gen     
+% Determine the position of the flyby times in the gen
 %
 ind.ToF(1) = ind.t0 + 1;
 ind.ToF(2) = ind.ToF(1) + n_fb_max;
 %
-% Determine the position of the revolution number in the gen     
+% Determine the position of the revolution number in the gen
 %
 ind.rev(1) = ind.ToF(2) + 1;
 ind.rev(2) = ind.rev(1) + n_fb_max;
@@ -81,11 +81,11 @@ fbb_max   = ((length(planet_fb)+1))*ones(1 , n_fb_max);
 jj = 1;
 %
 while n_fb_min > 0
-  %
-  fbb_max(jj) = fbb_max(jj) -1;
-  jj = jj+1;
-  n_fb_min    = n_fb_min-1;
-  %
+    %
+    fbb_max(jj) = fbb_max(jj) -1;
+    jj = jj+1;
+    n_fb_min    = n_fb_min-1;
+    %
 end
 %
 % Set Min/Max Values for the initial date
@@ -140,14 +140,21 @@ input.available_planets = length(planet_fb);
 if numel(input.Initial_Date) > 1
     
     input.t0_min  = input.Initial_Date(1);
-    input.t0_max  = input.Initial_Date(2); 
+    input.t0_max  = input.Initial_Date(2);
     
 else
     
     input.t0_min  = input.Initial_Date(1);
-    input.t0_max  = input.Initial_Date(1);   
+    input.t0_max  = input.Initial_Date(1);
     
 end
+%
+% Create output folder
+%
+if ~exist(input.output_dir, 'dir')
+    mkdir(input.output_dir)
+end
+
 %
 %--------------------------------------------------------------------------
 % Set the NSGA-II genetic algorithm parameters
@@ -155,7 +162,7 @@ end
 %
 %  Initialize options structure
 %
-options = nsgaopt();          
+options = nsgaopt();
 %
 % Set User defined population size
 %
@@ -181,10 +188,11 @@ options.mutation   = {'gaussian',0.1, 0.2};     % mutation operator (scale=0.1(d
 options.crossoverFraction = 0.8;                % crossover fraction of variables of an individual ( 2/numVar )-->only crossoverFraction of all variables would do crossover
 options.mutationFraction  = 0.3;                % only mutaionFraction of all variables would do mutation (default 2/numvar)
 options.objfun            = @fitness_nsga2;      % objective function handle
-options.plotInterval      = 1;                  % interval between two calls of "plotnsga". 
-options.outputInterval    = 1; 
-options.outputfile        = input.output_file;  %outputfile
-options.useParallel       = input.useParallel;  % Parallel option. 
+options.plotInterval      = 1;                  % interval between two calls of "plotnsga".
+options.outputInterval    = 1;
+options.outputfile_dir    = input.output_dir;
+options.outputfile        = [input.output_dir,'/Results_extended.txt'];  %outputfile
+options.useParallel       = input.useParallel;  % Parallel option.
 options.vartype           = vartype;
 %
 if ~isempty(input.init_file)
@@ -192,7 +200,7 @@ if ~isempty(input.init_file)
 end
 %
 %--------------------------------------------------------------------------
-% Load Spiece Kernels for parallel workers 
+% Load Spiece Kernels for parallel workers
 %--------------------------------------------------------------------------
 %
 if strcmp(options.useParallel,'no')
@@ -215,6 +223,6 @@ end
 % Call NSGA-II algorithm
 %--------------------------------------------------------------------------
 %
-output = nsga2(options,input); 
+output = nsga2(options,input);
 %
 %

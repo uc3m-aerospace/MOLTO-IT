@@ -63,10 +63,10 @@ tub =  + 200/(tc)*(3600*24);
 % Solve Minimization Problem
 %%--------------------------------------------------------------------------
 %
-options = optimoptions(@fmincon,'Algorithm','sqp','MaxIterations',1500,'Display','off','MaxFunctionEvaluations',9000,'FunctionTolerance',1e-5,'ConstraintTolerance',1e-3);
+options = optimoptions(@fmincon,'Algorithm','sqp','MaxIterations',100,'Display','off','MaxFunctionEvaluations',9000,'FunctionTolerance',1e-5,'ConstraintTolerance',1e-3);
 %
 if aux.plot == 1
-    options = optimoptions(@fmincon,'Algorithm','sqp','MaxIterations',1500,'Display','iter','MaxFunctionEvaluations',2000,'FunctionTolerance',1e-5,'ConstraintTolerance',1e-10);
+    options = optimoptions(@fmincon,'Algorithm','sqp','MaxIterations',100,'Display','iter','MaxFunctionEvaluations',2000,'FunctionTolerance',1e-5,'ConstraintTolerance',1e-10);
 end
 %
 try
