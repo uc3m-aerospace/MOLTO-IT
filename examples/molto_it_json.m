@@ -1,5 +1,5 @@
 %--------------------------------------------------------------------------0
-function  output = molto_it_json(jsonfile)
+function  molto_it_json(jsonfile)
 %--------------------------------------------------------------------------
 %	MOLTO-IT Software Computation Core										
 %																			
@@ -14,9 +14,10 @@ function  output = molto_it_json(jsonfile)
 %																			
 %--------------------------------------------------------------------------
 %
-%    Function that call molto-it given a problem defined in a jsonfile
+%    Function that call molto-it given a problem defined in a json formated
+%    file
 %
 %--------------------------------------------------------------------------
 
 input  = jsondecode(jsonfile);
-output = molto_it(input);
+[~] = molto_it(input);
