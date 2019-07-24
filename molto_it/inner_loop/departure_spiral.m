@@ -19,15 +19,17 @@ function[DV,out,flag] = departure_spiral(planet1,planet2,et0,ToF,type,aux)
 %    and is to flyby or rendezvous planet2
 %
 %--------------------------------------------------------------------------
-tc  = aux.tc;
-lc  = aux.lc;
-mu  = aux.mu;
+tc     = aux.tc;
+lc     = aux.lc;
+mu     = aux.mu;
+flag   = 0;
+aux.ok = 0;
 %%--------------------------------------------------------------------------
-aux.planet1      = planet1;
-aux.planet2      = planet2;
-aux.et0          = et0;
-aux.ToF          = ToF/(tc)*(3600*24);
-aux.type         = type;
+aux.planet1  = planet1;
+aux.planet2  = planet2;
+aux.et0      = et0;
+aux.ToF      = ToF/(tc)*(3600*24);
+aux.type     = type;
 %--------------------------------------------------------------------------
 % Orbital Elements for Departure planet
 %--------------------------------------------------------------------------
@@ -78,10 +80,6 @@ end
 %
 options = optimoptions(@fmincon,'Algorithm','sqp','MaxIterations',100,'Display','off','MaxFunctionEvaluations',9000,'FunctionTolerance',1e-5,'ConstraintTolerance',1e-3);
 %
-if aux.plot == 1
-    options = optimoptions(@fmincon,'Algorithm','sqp','MaxIterations',100,'Display','iter','MaxFunctionEvaluations',2000,'FunctionTolerance',1e-5,'ConstraintTolerance',1e-3);
-end
-%
 try
     %
     lb = [0, tlb, 0, -0.1, -pi];
@@ -109,7 +107,7 @@ catch
     %
 end
 %
-[c,ceq]  = departure_cons(x,aux);
+[~,ceq]  = departure_cons(x,aux);
 %
 if exitflag <= 0 ||(norm(ceq) > 1e-2)
     try
@@ -140,7 +138,7 @@ if exitflag <= 0 ||(norm(ceq) > 1e-2)
     
 end
 %
-[c,ceq]  = departure_cons(x,aux);
+[~,ceq]  = departure_cons(x,aux);
 %
 if exitflag <= 0 ||(norm(ceq) > 1e-2)
     %
@@ -151,16 +149,8 @@ if exitflag <= 0 ||(norm(ceq) > 1e-2)
     %
 else
     %
-    flag     = 0;
-    if aux.plot == 0
-        [DV,out] = departure_obj(x,aux);
-    else
-        departure_cons(x,aux)
-        [DV,out] = departure_plot(x,aux);
-        [DV,out] = departure_obj(x,aux);
-        out.et_fact
-        cspice_et2utc(out.et,'C',0)
-    end
+    aux.ok = 1;
+    [DV,out] = departure_obj(x,aux);
     %
 end
 %

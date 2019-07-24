@@ -20,9 +20,11 @@ function[DV,out,flag] = flyby_spiral(planet1,planet2,et0,ToF,type,aux)
 %    flyby and is to flyby or rendezvous planet2
 %
 %--------------------------------------------------------------------------
-lc  = aux.lc;
-mu  = aux.mu;
-tc  = aux.tc;
+lc     = aux.lc;
+mu     = aux.mu;
+tc     = aux.tc;
+aux.ok = 0;
+flag   = 0;
 %%--------------------------------------------------------------------------
 aux.planet1  = planet1;
 aux.planet2  = planet2;
@@ -64,10 +66,6 @@ tub =  + 200/(tc)*(3600*24);
 %%--------------------------------------------------------------------------
 %
 options = optimoptions(@fmincon,'Algorithm','sqp','MaxIterations',100,'Display','off','MaxFunctionEvaluations',9000,'FunctionTolerance',1e-5,'ConstraintTolerance',1e-3);
-%
-if aux.plot == 1
-    options = optimoptions(@fmincon,'Algorithm','sqp','MaxIterations',100,'Display','iter','MaxFunctionEvaluations',2000,'FunctionTolerance',1e-5,'ConstraintTolerance',1e-10);
-end
 %
 try
     %
@@ -125,7 +123,7 @@ if exitflag <=0
     %
 end
 %
-[c,ceq]  = flyby_cons(x,aux);
+[~,ceq]  = flyby_cons(x,aux);
 
 if exitflag >0 && (norm(ceq) > 1e-2)
     
@@ -138,7 +136,7 @@ if exitflag >0 && (norm(ceq) > 1e-2)
     end
 end
 %
-[c,ceq]  = flyby_cons(x,aux);
+[~,ceq]  = flyby_cons(x,aux);
 %
 if exitflag <= 0 ||(norm(ceq) > 1e-2)
     %
@@ -148,15 +146,9 @@ if exitflag <= 0 ||(norm(ceq) > 1e-2)
     %
 else
     %
-    flag = 0;
+    aux.ok = 1;
     %
-    if aux.plot == 0
-        [DV,out] = flyby_obj(x,aux);
-    else
-        [c,ceq]  = flyby_cons(x,aux)
-        [DV,out] = flyby_plot(x,aux);
-        [DV,out] = flyby_obj(x,aux);
-    end
+    [DV,out] = flyby_obj(x,aux);
     %
 end
 %

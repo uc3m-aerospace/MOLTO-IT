@@ -1,4 +1,4 @@
-function[DV,vf,psif,at,t,data_all] = get_DV_plot(setup)
+function[DV,vf,psif,data_all] = get_DV_plot(setup)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TARGET RADIUS AND TIME
@@ -28,15 +28,7 @@ angle   = linspace(theta0,thetaA,60);
 %
 [ r , v , t1 , a , e , w , at1 , psi ,alpha,DV1, ~] = propagate_spirals_DV_plot( K1i, K2i, eei, regime0, r0, theta0, t0, angle);
 %
-[x1,y1] = pol2cart(angle,r,'red');
-plot(x1,y1)
-hold on
-%
-mark = plot(x1(1),y1(1),'red o');
-set(mark,'MarkerSize',7)
-set(mark,'LineWidth',3)
-%
-data_all = [t1',r',v',psi',alpha',at1',angle'];
+data_all = [t1'*setup.tc,r',v'*setup.vc,psi',at1'*setup.ac,alpha',angle'];
 %
 %------------------------------------------------------------------
 % COAST ARC / KEPLERIAN ORBIT
@@ -87,28 +79,12 @@ t2      = t1(end)+tk;
 at2     = zeros(size(t2));
 alpha   = zeros(size(t2));
 %
-[x2,y2] = pol2cart(angle,r);
-%
-plot(x2,y2,'black')
-%
-mark = plot(x2(1),y2(1),'black o');
-set(mark,'MarkerSize',7)
-set(mark,'LineWidth',3)
-%
-mark = plot(x2(end),y2(end),'black o');
-set(mark,'MarkerSize',7)
-set(mark,'LineWidth',3)
-%
-%
-data_all = [data_all;t2(2:end)',r(2:end)',v(2:end)',psi(2:end)',at2(2:end)',alpha(2:end)',angle(2:end)'];
+data_all = [data_all;t2(2:end)'*setup.tc,r(2:end)',v(2:end)'*setup.vc,psi(2:end)',at2(2:end)'*setup.ac,alpha(2:end)',angle(2:end)'];
 %
 %
 %------------------------------------------------------------------
 % SECOND SPIRAL ARC
 %------------------------------------------------------------------
-%
-t3  = [];
-at3 = [];
 %
 if setup.type >0
     %
@@ -124,19 +100,8 @@ if setup.type >0
     %
     t3 = t2(end) + t3;
     %
-    data_all = [data_all;t3(2:end)',r(2:end)',v(2:end)',psi(2:end)',at3(2:end)',alpha(2:end)',angle(2:end)'];
+    data_all = [data_all;t3(2:end)'*setup.tc,r(2:end)',v(2:end)'*setup.vc,psi(2:end)',at3(2:end)'*setup.ac,alpha(2:end)',angle(2:end)'];
     %
-    [x2,y2] = pol2cart(angle,r,'red');
-    plot(x2,y2)
-    hold on
-    
-    mark = plot(x2(1),y2(1),'red o');
-    set(mark,'MarkerSize',7)
-    set(mark,'LineWidth',3)
-    
-    mark = plot(x2(end),y2(end),'red o');
-    set(mark,'MarkerSize',7)
-    set(mark,'LineWidth',3)
 else
     DV2 = 0;
 end
@@ -151,8 +116,4 @@ psif = psi(end);
 %
 vf   = v(end);
 %
-at = [at1,at2,at3];
-t  = [t1,t2,t3] ;
-
-
 

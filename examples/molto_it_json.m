@@ -18,6 +18,7 @@ function  molto_it_json(jsonfile)
 %    file
 %
 %--------------------------------------------------------------------------
-
+%A = textread(jsonfile,'%100000s');
+%jsonfile = A{1,1};
 input  = jsondecode(jsonfile);
 [~] = molto_it(input);

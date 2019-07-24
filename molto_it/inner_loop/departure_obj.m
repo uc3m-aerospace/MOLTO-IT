@@ -79,7 +79,13 @@ setup.thetaf = thetaf;
 %
 % Obtain DV
 %
-[DV, vsp, psisp] = get_DV(setup);
+if setup.plot > 0 && setup.ok == 1
+    [DV, vsp, psisp,data_all] = get_DV_plot(setup);
+    aux.data_all = data_all;
+    
+else
+    [DV, vsp, psisp] = get_DV(setup);
+end
 %
 aux.thetasp = thetaf;
 aux.rsp     = rf;

@@ -1,4 +1,4 @@
-%--------------------------------------------------------------------------0
+%--------------------------------------------------------------------------
 function output = molto_it(input)
 %--------------------------------------------------------------------------
 %	MOLTO-IT Software Computation Core
@@ -21,6 +21,7 @@ function output = molto_it(input)
 %
 % Include paths
 %
+output = [];
 addpath(genpath('~/MOLTO-IT'))
 input.spice_dir = '~/MOLTO-IT/spice';
 %
@@ -223,6 +224,106 @@ end
 % Call NSGA-II algorithm
 %--------------------------------------------------------------------------
 %
-output = nsga2(options,input);
+if input.plot == 0
+    %
+    % Run Genetic Algorithm
+    %
+    output = nsga2(options,input);
+else
+    %
+    % Plot Result of input.plot generation
+    %
+    % STEP 1: obatin variables from standard file Results_extended.txt
+    %
+    sol = loadpopfile(options.outputfile);
+    %
+    % STEP 2: Take last Generation 
+    %
+    last_gen = sol.pops(end,:);
+    %
+    % STEP 3: Take desired population defined in the varibale input.plot
+    %
+    population = last_gen(input.plot);
+    x = population.var;
+    %
+    % STEP 4: Propagate spiral
+    %
+    [~,~,outdata] = fitness_nsga2(x,input);
+    %
+    % STEP 5: Plot trajectory
+    %
+    hh = figure(1);
+    hold on
+    axis equal
+    grid on
+    xlabel('X(AU)')
+    ylabel('Y(AU)')
+    for ii = 1:outdata.n_fb_real +1
+        
+        data  = outdata.out{ii};
+        r     = data(:,2);
+        angle = data(:,7);
+        at    = data(:,5);
+        %data_all = [data_all;t2(2:end)',r(2:end)',v(2:end)',psi(2:end)',at2(2:end)',alpha(2:end)',angle(2:end)'];
+        [x,y] = pol2cart(angle,r);
+        %
+        mark1 = plot(x(1),y(1),'black o');
+        set(mark1,'MarkerFaceColor','black')
+        set(mark1,'MarkerSize',7)
+        %
+        mark2 = plot(x(end),y(end),'black o');
+        set(mark2,'MarkerFaceColor','black')
+        set(mark2,'MarkerSize',7)
+        %
+        % Plot thrust-coast-thrust sequence
+        %
+        cond1 = at == 0;
+        cond2 = find(cond1(1:end-1) ~= cond1(2:end))';
+        idx = [1,cond2,numel(at)];
+        for jj = 1:numel(cond2)+1
+            if jj ==2
+                plot(x(idx(jj):idx(jj+1)),y(idx(jj):idx(jj+1)),'black --')
+                
+                mark3 = plot(x(idx(jj)),y(idx(jj)),'black o');
+                set(mark3,'MarkerFaceColor','white')
+                set(mark3,'MarkerSize',7)
+                
+                mark4 = plot(x(idx(jj+1)),y(idx(jj+1)),'black o');
+                set(mark4,'MarkerFaceColor','white')
+                set(mark4,'MarkerSize',7)
+            else
+                plot(x(idx(jj):idx(jj+1)),y(idx(jj):idx(jj+1)),'black -')
+            end
+        end
+    end
+    
+    saveas(hh,[input.output_dir,'/Trajectory',num2str(input.plot)],'epsc')
+    close (hh);   
+    %
+    % STEP 6: Plot Thrust
+    %
+    hh2 = figure(2);
+    hold on
+    grid on
+    xlabel('Time(years)')
+    ylabel('Acceleration')
+    t0   = 0;
+    for ii = 1:outdata.n_fb_real +1
+        
+        data  = outdata.out{ii};
+        time  = data(:,1)/(3600*24*365) + t0;
+        at    = data(:,5);
+        %data_all = [data_all;t2(2:end)',r(2:end)',v(2:end)',psi(2:end)',at2(2:end)',alpha(2:end)',angle(2:end)'];
+        plot(time,at)
+        t0    = time(end);
+    end
+    
+        saveas(hh2,[input.output_dir,'/Accel',num2str(input.plot)],'epsc')
+        close (hh2);
+    
+    
+    
+    
+end
 %
 %

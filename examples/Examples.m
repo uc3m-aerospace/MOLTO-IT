@@ -38,6 +38,7 @@ switch(example)
         input.Initial_Date  = [{'2003-Jan-01'},{'2003-Dec-31'}];
         input.init_file     = [];
         input.output_dir    = ['~/tmp/Ceres'];
+        input.output_file   = [];
         input.plot          = 0;
         input.useParallel   = 'no';
         input.options       = [];
@@ -65,6 +66,7 @@ switch(example)
         input.Initial_Date  = [{'2029-Jan-01'},{'2030-Dec-31'}];
         input.init_file     = [];
         input.output_dir    = ['~/tmp/Jupiter'];
+        input.output_file   = [];
         input.plot          = 0;
         input.useParallel   = 'yes';
         input.options       = [];
@@ -92,6 +94,7 @@ switch(example)
         input.Initial_Date  = [{'2028-Jan-01'},{'2028-Dec-31'}];
         input.init_file     = [];
         input.output_dir    = ['~/tmp/Pluto'];
+        input.output_file   = [];
         input.plot          = 0;
         input.useParallel   = 'yes';
         input.options       = [];
@@ -100,7 +103,6 @@ switch(example)
 end
 %
 % PREPARE AND SAVE INPUT STRUCTURE
-%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 output = molto_it(input);

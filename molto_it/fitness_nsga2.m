@@ -1,4 +1,4 @@
-function [Obj,Cons] = fitness_nsga2(x,setup,~)
+function [Obj,Cons, outdata] = fitness_nsga2(x,setup,~)
 %--------------------------------------------------------------------------
 %	MOLTO-IT Software Computation Core
 %
@@ -95,9 +95,9 @@ if isfield(setup,'vinff_max')
     data.vinff_max      = setup.vinff_max*1e3/vc;
 end
 %
-%%--------------------------------------------------------------------------
+%%-------------------------------------------------------------------------
 % INITIALIZE VARIABLES
-%%--------------------------------------------------------------------------
+%%-------------------------------------------------------------------------
 %
 et        = zeros(1,n_fb+2);
 r         = zeros(1,n_fb+2);
@@ -108,22 +108,20 @@ type      = zeros(1,n_fb+1);
 type(end) = transfer_type;
 et(1)     = et0;
 %
-%%--------------------------------------------------------------------------
+%%-------------------------------------------------------------------------
 % PROPAGATE SPIRALS
-%%--------------------------------------------------------------------------
+%%-------------------------------------------------------------------------
 %
 DV    = zeros(n_fb+1,1);
 ToF   = zeros(n_fb+2,1);
 flag  = 0;
 %
 j     = 0;
-t     = 0;
 flagT = n_fb+1;
 %
 for i = 1 : n_fb + 1
     %
     data.n = rev(i);
-    
     %%--------------------------------------------------------------------------
     % Null Flyby
     %%--------------------------------------------------------------------------
@@ -136,7 +134,7 @@ for i = 1 : n_fb + 1
         v(i+1)     = v(i);
         theta(i+1) = theta(i);
         psi(i+1)   = psi(i);
-        ToF(i+1)     = 0;
+        ToF(i+1)   = 0;
         flagT      = flagT -1;
         %
     else
@@ -149,7 +147,7 @@ for i = 1 : n_fb + 1
             %
             % Departure
             %
-            [DV(i),out,flag] = departure_spiral(planet_seq(1),planet_seq(i+1),et(1),ToFg(t+1),type(i),data);
+            [DV(i),out,flag] = departure_spiral(planet_seq(1),planet_seq(i+1),et(1),ToFg(j+1),type(i),data);
             %
             % Update Initial Launch date
             %
@@ -159,37 +157,43 @@ for i = 1 : n_fb + 1
             %
             % From Flyby
             %
-            [DV(i),out,flag] = flyby_spiral(planet_seq(i),planet_seq(i+1),et(i),ToFg(t+1),type(i),data);
+            [DV(i),out,flag] = flyby_spiral(planet_seq(i),planet_seq(i+1),et(i),ToFg(j+1),type(i),data);
             %
         end
         %
         j = j+1;
         %
         %%--------------------------------------------------------------------------
-        % Break loop is an unfeasible trajectory is found
+        % Break loop if an unfeasible trajectory is found
         %%--------------------------------------------------------------------------
         %
-        if flag == -1 || DV(i) > 500
+        outdata.flag = flag;
+        %
+        if flag == -1
             break
+        elseif setup.plot > 0
+            outdata.out{j} = out.data_all;
         end
         %
         % Update initial values for the following leg
         %
-        ToF(i+1)        = out.ToF;
-        data.vfb        = out.vp;
-        data.psifb      = out.psip;
-        data.theta0     = out.thetasp;
-        data.r0         = out.rsp;
-        data.v0         = out.vsp;
-        data.psi0       = out.psisp;
-        et(i+1)         = ToF(i+1)*tc + et(i);
+        ToF(i+1)     = out.ToF;
+        data.vfb     = out.vp;
+        data.psifb   = out.psip;
+        data.theta0  = out.thetasp;
+        data.r0      = out.rsp;
+        data.v0      = out.vsp;
+        data.psi0    = out.psisp;
+        et(i+1)      = ToF(i+1)*tc + et(i);
         %
         flagT = flagT - 1;
         %
     end
-    t = t+1;
     
 end
+%
+outdata.n_fb_real    = j-1;
+outdata.initial_date = cspice_et2utc(et(1),'C',0);
 %
 %--------------------------------------------------------------------------
 % COMPUTE TOTAL DV FOR THE SPIRAL
@@ -201,7 +205,7 @@ if flag == 0
     %
     DV_main  =  (sum(DV)) *  vc / 1000;
     DV_total =  1 - exp ( - ( DV_main /(setup.Isp/1000) )  / (9.81) );
-    Time = ( sum(ToF) )*tc/(3600*24*365) ;
+    Time     = ( sum(ToF) )*tc/(3600*24*365) ;
     %
     % Penalty for high DV trajectories
     %
