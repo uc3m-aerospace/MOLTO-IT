@@ -207,8 +207,7 @@ end
 %--------------------------------------------------------------------------
 %
 if strcmp(options.useParallel,'no')
-    %
-    disp(input.spice_dir);
+    %    
     load_spice_kernels(input.spice_dir);
 else
     %

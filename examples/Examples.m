@@ -43,7 +43,7 @@ switch(example)
         input.useParallel   = 'no';
         input.options       = [];
         input.maxGen        = 10;
-        input.popsize       = 10;
+        input.popsize       = 50;
         
     case'Jupiter'
         
