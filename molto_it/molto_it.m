@@ -22,8 +22,10 @@ function output = molto_it(input)
 % Include paths
 %
 output = [];
-addpath(genpath('~/MOLTO-IT'))
-input.spice_dir = '~/MOLTO-IT/spice';
+absPath = pwd;
+addpath(genpath(absPath))
+input.spice_dir = [absPath, '/spice'];
+
 %
 % Load maximum/minimum number of flybys
 %
@@ -206,6 +208,7 @@ end
 %
 if strcmp(options.useParallel,'no')
     %
+    disp(input.spice_dir);
     load_spice_kernels(input.spice_dir);
 else
     %
@@ -213,7 +216,7 @@ else
     delete(gcp('nocreate'));
     p= gcp;
     parfor jj  = 1:p.NumWorkers
-        %
+        %        
         load_spice_kernels(input.spice_dir);
         %
     end
