@@ -37,7 +37,7 @@ switch(example)
         input.ToF           = [100,1000];
         input.Initial_Date  = [{'2003-Jan-01'},{'2003-Dec-31'}];
         input.init_file     = [];
-        input.output_dir    = ['~/tmp/Ceres'];
+        input.output_dir    = [pwd, '/tmp/Ceres'];
         input.output_file   = [];
         input.plot          = 0;
         input.useParallel   = 'no';
@@ -65,7 +65,7 @@ switch(example)
         input.power         = 5000; % W
         input.Initial_Date  = [{'2029-Jan-01'},{'2030-Dec-31'}];
         input.init_file     = [];
-        input.output_dir    = ['~/tmp/Jupiter'];
+        input.output_dir    = [pwd, '/tmp/Jupiter'];
         input.output_file   = [];
         input.plot          = 0;
         input.useParallel   = 'yes';
@@ -93,7 +93,7 @@ switch(example)
         input.ToF           = [200 9125];
         input.Initial_Date  = [{'2028-Jan-01'},{'2028-Dec-31'}];
         input.init_file     = [];
-        input.output_dir    = ['~/tmp/Pluto'];
+        input.output_dir    = [pwd, '/tmp/Pluto'];
         input.output_file   = [];
         input.plot          = 0;
         input.useParallel   = 'yes';

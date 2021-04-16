@@ -2,7 +2,6 @@
 % path in your computer to the MICE main folder (e.g. C:/documents/mice)
 function ME = load_spice_kernels ( path2mice )
 
-
 % Add the path to the SPICE (MICE) library and matlab source files
 mice_src = [path2mice filesep 'mice/src' filesep 'mice' filesep ];
 mice_lib = [path2mice filesep 'mice/lib' filesep ];
@@ -11,6 +10,8 @@ kernels = [s.path filesep];
 addpath(mice_src);
 addpath(mice_lib);
 addpath(kernels);
+
+
 %
 % Load the required data:
 %
